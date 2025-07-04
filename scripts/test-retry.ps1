@@ -2,7 +2,7 @@
 Write-Host "=== Prueba del Sistema de Reintentos Exponenciales ===" -ForegroundColor Green
 
 # Cambiar al directorio de infra
-Set-Location "infra"
+Set-Location "../infra"
 
 # 1. Verificar que todos los servicios están corriendo
 Write-Host "1. Verificando servicios..." -ForegroundColor Yellow
@@ -11,7 +11,7 @@ docker-compose ps
 # 2. Enviar mensaje de prueba a Kafka
 Write-Host "2. Enviando mensaje de prueba a Kafka..." -ForegroundColor Yellow
 $testMessage = '{"orderId":"test-001","customerId":"customer-1","products":["product-1","product-2"]}'
-echo $testMessage | docker-compose exec -T kafka kafka-console-producer.sh --broker-list localhost:9092 --topic orders
+echo $testMessage | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders
 
 # 3. Verificar logs del order-worker
 Write-Host "3. Verificando logs del order-worker..." -ForegroundColor Yellow
@@ -28,7 +28,7 @@ docker-compose stop product-api
 # 6. Enviar otro mensaje para triggear retry
 Write-Host "6. Enviando mensaje para triggear retry..." -ForegroundColor Yellow
 $retryMessage = '{"orderId":"test-002","customerId":"customer-2","products":["product-3"]}'
-echo $retryMessage | docker-compose exec -T kafka kafka-console-producer.sh --broker-list localhost:9092 --topic orders
+echo $retryMessage | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders
 
 # 7. Verificar logs de retry
 Write-Host "7. Verificando logs de retry..." -ForegroundColor Yellow

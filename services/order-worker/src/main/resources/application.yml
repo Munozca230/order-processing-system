@@ -1,8 +1,8 @@
 app:
   product-api:
-    base-url: http://product-api:8081
+    base-url: http://product-api:8080
   customer-api:
-    base-url: http://customer-api:8082
+    base-url: http://customer-api:8080
   retry:
     max-attempts: 5
     initial-delay: 1

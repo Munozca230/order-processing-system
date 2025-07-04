@@ -31,15 +31,19 @@ public class EnrichmentService {
         String messageContent = order.toString();
 
         return retryService.executeWithRetry(messageId, messageContent, () -> {
-            logger.info("Enriching order: {}", order.orderId());
+            logger.info("🔍 ENRICHMENT START for order: {}", order.orderId());
 
             Mono<CustomerDetails> customerMono = fetchCustomerWithRetry(order.customerId(), messageId);
             Flux<ProductDetails> productsFlux = fetchProductsWithRetry(order.products(), messageId);
 
             return Mono.zip(customerMono, productsFlux.collectList())
-                    .map(tuple -> new EnrichedOrder(order, tuple.getT1(), tuple.getT2()))
-                    .doOnSuccess(enrichedOrder -> logger.info("Successfully enriched order: {}", order.orderId()))
-                    .doOnError(error -> logger.error("Failed to enrich order: {}", order.orderId(), error));
+                    .map(tuple -> {
+                        logger.info("✅ ENRICHMENT ZIP SUCCESS: order={}, customer={}, products={}", 
+                            order.orderId(), tuple.getT1().name(), tuple.getT2().size());
+                        return new EnrichedOrder(order, tuple.getT1(), tuple.getT2());
+                    })
+                    .doOnSuccess(enrichedOrder -> logger.info("✅ ENRICHMENT COMPLETE: order={}", order.orderId()))
+                    .doOnError(error -> logger.error("❌ ENRICHMENT FAILED: order={}", order.orderId(), error));
         });
     }
 
@@ -47,11 +51,15 @@ public class EnrichmentService {
         return retryService.executeWithRetry(
             messageId + "_customer_" + customerId,
             "customer:" + customerId,
-            () -> customerApiClient.get()
-                .uri("/customers/{id}", customerId)
-                .retrieve()
-                .bodyToMono(CustomerDetails.class)
-                .doOnNext(customer -> logger.debug("Fetched customer: {}", customerId))
+            () -> {
+                logger.info("👤 FETCHING customer: {}", customerId);
+                return customerApiClient.get()
+                    .uri("/customers/{id}", customerId)
+                    .retrieve()
+                    .bodyToMono(CustomerDetails.class)
+                    .doOnSuccess(customer -> logger.info("✅ CUSTOMER FETCHED: {} - {}", customer.customerId(), customer.name()))
+                    .doOnError(error -> logger.error("❌ CUSTOMER FETCH FAILED: {}", customerId, error));
+            }
         );
     }
 
@@ -60,11 +68,15 @@ public class EnrichmentService {
                 .flatMap(productId -> retryService.executeWithRetry(
                     messageId + "_product_" + productId,
                     "product:" + productId,
-                    () -> productApiClient.get()
-                        .uri("/products/{id}", productId)
-                        .retrieve()
-                        .bodyToMono(ProductDetails.class)
-                        .doOnNext(product -> logger.debug("Fetched product: {}", productId))
+                    () -> {
+                        logger.info("📦 FETCHING product: {}", productId);
+                        return productApiClient.get()
+                            .uri("/products/{id}", productId)
+                            .retrieve()
+                            .bodyToMono(ProductDetails.class)
+                            .doOnSuccess(product -> logger.info("✅ PRODUCT FETCHED: {} - {}", product.productId(), product.name()))
+                            .doOnError(error -> logger.error("❌ PRODUCT FETCH FAILED: {}", productId, error));
+                    }
                 ));
     }
 }

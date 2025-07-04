@@ -42,30 +42,58 @@ public class OrderKafkaConsumer {
 
     @KafkaListener(topics = "orders", groupId = "order-worker-group")
     public void consume(String message) {
-        logger.info("Received order message: {}", message);
+        logger.info("🔄 RECEIVED order message: {}", message);
         try {
             OrderMessage order = mapper.readValue(message, OrderMessage.class);
+            logger.info("📦 PARSED OrderMessage: orderId={}, customerId={}, products={}", 
+                order.orderId(), order.customerId(), order.products());
+            
             lockService.acquire(order.orderId())
                     .flatMap(acquired -> {
                         if (!acquired) {
-                            logger.info("Order {} is already being processed, skipping", order.orderId());
+                            logger.warn("🔒 Order {} is already being processed, skipping", order.orderId());
                             return Mono.empty();
                         }
+                        logger.info("🔓 ACQUIRED lock for order: {}", order.orderId());
+                        
                         return enrichmentService.enrich(order)
-                                .flatMap(validationService::validate)
-                                .flatMap(valid -> orderRepository.save(OrderDocument.from(valid))
-                                        .retryWhen(reactor.util.retry.Retry.backoff(5, java.time.Duration.ofSeconds(1)))
-                                        .thenReturn(valid))
+                                .doOnSuccess(enriched -> logger.info("✅ ENRICHMENT SUCCESS for order: {}, products enriched: {}", 
+                                    enriched.order().orderId(), enriched.products().size()))
+                                .doOnError(error -> logger.error("❌ ENRICHMENT FAILED for order: {}", order.orderId(), error))
+                                .flatMap(enriched -> {
+                                    logger.info("🔍 STARTING validation for order: {}", enriched.order().orderId());
+                                    return validationService.validate(enriched)
+                                            .doOnSuccess(valid -> logger.info("✅ VALIDATION SUCCESS for order: {}", valid.order().orderId()))
+                                            .doOnError(error -> logger.error("❌ VALIDATION FAILED for order: {}", enriched.order().orderId(), error));
+                                })
+                                .flatMap(valid -> {
+                                    logger.info("💾 STARTING MongoDB save for order: {}", valid.order().orderId());
+                                    OrderDocument doc = OrderDocument.from(valid);
+                                    logger.info("📄 Created OrderDocument: id={}, orderId={}, customerId={}, products={}", 
+                                        doc.id(), doc.orderId(), doc.customerId(), doc.products().size());
+                                    
+                                    return orderRepository.save(doc)
+                                            .retryWhen(reactor.util.retry.Retry.backoff(5, java.time.Duration.ofSeconds(1)))
+                                            .doOnSuccess(saved -> logger.info("✅ MONGODB SAVE SUCCESS: id={}, orderId={}", saved.id(), saved.orderId()))
+                                            .doOnError(error -> logger.error("❌ MONGODB SAVE FAILED for order: {}", valid.order().orderId(), error))
+                                            .thenReturn(valid);
+                                })
                                 .doOnNext(enriched -> {
-                                    logger.info("Enriched and validated order: {}", enriched);
+                                    logger.info("🎉 ORDER PROCESSING COMPLETED: {}", enriched.order().orderId());
                                     publisher.publishEvent(new ProcessedOrderEvent(this, enriched));
                                 })
-                                .doFinally(sig -> lockService.release(order.orderId()).subscribe());
+                                .doOnError(processingError -> {
+                                    logger.error("💥 ORDER PROCESSING PIPELINE FAILED for order: {}", order.orderId(), processingError);
+                                })
+                                .doFinally(sig -> {
+                                    logger.info("🔓 RELEASING lock for order: {}", order.orderId());
+                                    lockService.release(order.orderId()).subscribe();
+                                });
                     })
-                    .doOnError(err -> logger.error("Order processing failed", err))
+                    .doOnError(err -> logger.error("💥 CONSUMER ERROR for message: {}", message, err))
                     .subscribe();
         } catch (IOException e) {
-            logger.error("Failed to deserialize order", e);
+            logger.error("💥 JSON DESERIALIZATION FAILED for message: {}", message, e);
         }
     }
 }

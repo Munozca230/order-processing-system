@@ -11,18 +11,14 @@ public record OrderDocument(
         @Id String id,
         String orderId,
         String customerId,
-        List<ProductDetails> products,
-        Instant processedAt,
-        String status
+        List<ProductDetails> products
 ) {
     public static OrderDocument from(EnrichedOrder enriched) {
         return new OrderDocument(
                 null,
                 enriched.order().orderId(),
                 enriched.order().customerId(),
-                enriched.products(),
-                Instant.now(),
-                "VALID"
+                enriched.products()
         );
     }
 }
