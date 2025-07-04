@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start services (docker-compose)
+        run: |
+          docker compose -f infra/docker-compose.yml up -d --build
+
+      - name: List running containers
+        run: docker ps -a
+
+      - name: Check container health
+        run: |
+          unhealthy=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{end}} {{.Name}}' $(docker ps -q) | grep unhealthy || true)
+          if [ ! -z "$unhealthy" ]; then
+            echo "Some containers are unhealthy:";
+            echo "$unhealthy";
+            exit 1;
+          fi
+
+      - name: Placeholder for tests (to be added in next stages)
+        run: echo "tests pending"
+
+      - name: Shut down services
+        if: always()
+        run: docker compose -f infra/docker-compose.yml down -v
