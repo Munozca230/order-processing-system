@@ -42,7 +42,7 @@ services:
       context: ../order-worker
       dockerfile: Dockerfile
     environment:
-      - SPRING_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - kafka
       - mongo
