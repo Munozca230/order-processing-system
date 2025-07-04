@@ -1,0 +1,5 @@
+app:
+  product-api:
+    base-url: http://product-api:8081
+  customer-api:
+    base-url: http://customer-api:8082
