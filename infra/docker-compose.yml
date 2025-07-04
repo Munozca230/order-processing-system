@@ -46,12 +46,22 @@ services:
       - redis
 
   product-api:
-    image: alpine:3.19
-    command: ["sh","-c","echo 'Product API placeholder'; sleep infinity"]
+    build:
+      context: ../product-api
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - kafka
 
   customer-api:
-    image: alpine:3.19
-    command: ["sh","-c","echo 'Customer API placeholder'; sleep infinity"]
+    build:
+      context: ../customer-api
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
 
 volumes:
   kafka-data:
