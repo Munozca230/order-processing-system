@@ -1,0 +1,2 @@
+com/example/orderworker/consumer/OrderKafkaConsumerTest.class
+com/example/orderworker/service/EnrichmentServiceTest.class

@@ -3,6 +3,7 @@ package com.example.orderworker.consumer;
 import com.example.orderworker.model.OrderMessage;
 import com.example.orderworker.service.EnrichmentService;
 import com.example.orderworker.service.ValidationService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,7 +18,8 @@ class OrderKafkaConsumerTest {
     void consume_shouldNotThrow() {
         EnrichmentService enrichment = Mockito.mock(EnrichmentService.class);
         ValidationService validation = Mockito.mock(ValidationService.class);
-        OrderKafkaConsumer consumer = new OrderKafkaConsumer(enrichment, validation);
+        ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+        OrderKafkaConsumer consumer = new OrderKafkaConsumer(enrichment, validation, publisher);
 
         Mockito.when(enrichment.enrich(Mockito.any(OrderMessage.class)))
                 .thenReturn(Mono.empty());

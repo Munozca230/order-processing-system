@@ -3,6 +3,8 @@ package com.example.orderworker.consumer;
 import com.example.orderworker.model.OrderMessage;
 import com.example.orderworker.service.EnrichmentService;
 import com.example.orderworker.service.ValidationService;
+import com.example.orderworker.event.ProcessedOrderEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +21,12 @@ public class OrderKafkaConsumer {
     private final ObjectMapper mapper = new ObjectMapper();
     private final EnrichmentService enrichmentService;
     private final ValidationService validationService;
+    private final ApplicationEventPublisher publisher;
 
-    public OrderKafkaConsumer(EnrichmentService enrichmentService, ValidationService validationService) {
+    public OrderKafkaConsumer(EnrichmentService enrichmentService, ValidationService validationService, ApplicationEventPublisher publisher) {
         this.enrichmentService = enrichmentService;
         this.validationService = validationService;
+        this.publisher = publisher;
     }
 
     @KafkaListener(topics = "orders", groupId = "order-worker-group")
@@ -32,7 +36,10 @@ public class OrderKafkaConsumer {
             OrderMessage order = mapper.readValue(message, OrderMessage.class);
             enrichmentService.enrich(order)
                     .flatMap(validationService::validate)
-                    .doOnNext(enriched -> logger.info("Enriched and validated order: {}", enriched))
+                    .doOnNext(enriched -> {
+                        logger.info("Enriched and validated order: {}", enriched);
+                        publisher.publishEvent(new ProcessedOrderEvent(this, enriched));
+                    })
                     .doOnError(err -> logger.error("Order processing failed", err))
                     .subscribe();
         } catch (IOException e) {
