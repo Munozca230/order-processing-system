@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:3.6
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka-data:/bitnami/kafka
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  order-worker:
+    image: alpine:3.19
+    command: ["sh","-c","echo 'Order Worker placeholder'; sleep infinity"]
+    depends_on:
+      - kafka
+      - mongo
+      - redis
+
+  product-api:
+    image: alpine:3.19
+    command: ["sh","-c","echo 'Product API placeholder'; sleep infinity"]
+
+  customer-api:
+    image: alpine:3.19
+    command: ["sh","-c","echo 'Customer API placeholder'; sleep infinity"]
+
+volumes:
+  kafka-data:
+  mongo-data:
+  redis-data:
