@@ -67,10 +67,11 @@ El sistema interactúa con:
 ---
 
 ## 6. Infraestructura & Despliegue
-1. **Entorno Local**: Docker Compose con servicios: kafka, zookeeper, mongo, redis, worker, apis.
-2. **Persistencia**: Volúmenes nombrados o bind mounts para bases de datos.
-3. **Ambientes**: dev → staging → prod.
-4. **CI/CD**: Pipeline que construye imágenes, ejecuta pruebas y despliega a Kubernetes o ECS.
+1. **Entorno Local**: Docker Compose con servicios completos: kafka, zookeeper, mongo, redis, order-worker, product-api, customer-api.
+2. **Persistencia**: Volúmenes nombrados para datos persistentes (kafka-data, mongo-data, redis-data).
+3. **Red**: Todos los servicios en la misma red Docker para comunicación interna.
+4. **Ambientes**: dev → staging → prod.
+5. **CI/CD**: Pipeline que construye imágenes, ejecuta pruebas y despliega a Kubernetes o ECS.
 
 ---
 
@@ -92,7 +93,27 @@ El sistema interactúa con:
 
 ---
 
-## 8. Roadmap de Desarrollo
+## 8. Flujos de Trabajo
+
+### Testing y Desarrollo
+```bash
+# Pruebas unitarias e integración (rápido, aislado)
+cd order-worker && mvn test
+```
+- Usa Testcontainers para crear infraestructura temporal
+- Independiente del Docker Compose
+- Ideal para desarrollo y CI/CD
+
+### Entorno Tipo Producción
+```bash
+# Sistema completo con networking real
+cd infra && docker-compose up -d
+```
+- Todas las aplicaciones en contenedores
+- Red Docker compartida (kafka:9092, mongo:27017, redis:6379)
+- Comportamiento idéntico a producción
+
+## 9. Roadmap de Desarrollo
 1. **MVP End-to-End** (flujo feliz sin retries).
 2. Validaciones de datos y manejo de errores.
 3. Retries & locks distribuidos.
@@ -102,7 +123,7 @@ El sistema interactúa con:
 
 ---
 
-## 9. Riesgos y Mitigaciones
+## 10. Riesgos y Mitigaciones
 | Riesgo | Impacto | Mitigación |
 |--------|---------|------------|
 | Sobrecarga de APIs externas | Pedidos en cola, alta latencia | Circuit-breaker + cache | 
@@ -112,7 +133,7 @@ El sistema interactúa con:
 
 ---
 
-## 10. Glosario
+## 11. Glosario
 • **Idempotencia**: Capacidad de procesar el mismo mensaje varias veces sin efectos adversos.
 • **Back-pressure**: Regulación del flujo para no sobrecargar consumidores.
 

@@ -1,0 +1,28 @@
+app:
+  product-api:
+    base-url: http://product-api:8081
+  customer-api:
+    base-url: http://customer-api:8082
+  retry:
+    max-attempts: 5
+    initial-delay: 1
+  webclient:
+    timeout: 10
+    max-memory-size: 1MB
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:orders}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: order-worker-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

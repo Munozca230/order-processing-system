@@ -3,18 +3,22 @@ package com.example.orderworker.service;
 import com.example.orderworker.model.CustomerDetails;
 import com.example.orderworker.model.OrderMessage;
 import com.example.orderworker.model.ProductDetails;
+import com.example.orderworker.repository.FailedMessageRepository;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.mock;
 
 class EnrichmentServiceTest {
 
@@ -28,8 +32,13 @@ class EnrichmentServiceTest {
         configureFor("localhost", wireMockServer.port());
 
         WebClient testClient = WebClient.builder().baseUrl("http://localhost:" + wireMockServer.port()).build();
+        
+        // Mock the RetryService for testing
+        FailedMessageRepository mockFailedMessageRepository = mock(FailedMessageRepository.class);
+        RetryService mockRetryService = new RetryService(mockFailedMessageRepository);
+        
         // Use same client for both product and customer for simplicity
-        enrichmentService = new EnrichmentService(testClient, testClient);
+        enrichmentService = new EnrichmentService(testClient, testClient, mockRetryService);
     }
 
     @AfterAll
