@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest
 class OrderIntegrationTest {
 
@@ -64,8 +65,8 @@ class OrderIntegrationTest {
     }
 
     @Autowired
-    void registerListener(org.springframework.context.ApplicationEventPublisher publisher) {
-        publisher.addApplicationListener((ApplicationListener<ProcessedOrderEvent>) event -> latch.countDown());
+    void registerListener(ConfigurableApplicationContext context) {
+        context.addApplicationListener((ApplicationListener<ProcessedOrderEvent>) event -> latch.countDown());
     }
 
     @Autowired
