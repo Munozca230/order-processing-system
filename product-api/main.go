@@ -1,11 +1,9 @@
 package main
 
 import (
-    "encoding/json"
-    "log"
     "net/http"
 
-    "github.com/gorilla/mux"
+    "github.com/labstack/echo/v4"
 )
 
 type Product struct {
@@ -14,25 +12,14 @@ type Product struct {
     Price float64 `json:"price"`
 }
 
-func getProduct(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    id := vars["id"]
-
+func getProduct(c echo.Context) error {
+    id := c.Param("id")
     p := Product{ID: id, Name: "placeholder", Price: 0}
-
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(p)
+    return c.JSON(http.StatusOK, p)
 }
 
 func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/products/{id}", getProduct).Methods(http.MethodGet)
-
-    srv := &http.Server{
-        Addr:    ":8080",
-        Handler: r,
-    }
-
-    log.Println("Product API listening on :8080")
-    log.Fatal(srv.ListenAndServe())
+    e := echo.New()
+    e.GET("/products/:id", getProduct)
+    e.Logger.Fatal(e.Start(":8080"))
 }

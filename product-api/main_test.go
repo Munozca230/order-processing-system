@@ -5,19 +5,23 @@ import (
     "net/http/httptest"
     "testing"
 
-    "github.com/gorilla/mux"
+    "github.com/labstack/echo/v4"
 )
 
 func TestGetProduct(t *testing.T) {
-    r := mux.NewRouter()
-    r.HandleFunc("/products/{id}", getProduct).Methods(http.MethodGet)
+    e := echo.New()
 
     req := httptest.NewRequest(http.MethodGet, "/products/123", nil)
-    resp := httptest.NewRecorder()
+    rec := httptest.NewRecorder()
+    c := e.NewContext(req, rec)
+    c.SetParamNames("id")
+    c.SetParamValues("123")
 
-    r.ServeHTTP(resp, req)
+    if err := getProduct(c); err != nil {
+        t.Fatalf("handler returned error: %v", err)
+    }
 
-    if resp.Code != http.StatusOK {
-        t.Fatalf("expected status 200, got %d", resp.Code)
+    if rec.Code != http.StatusOK {
+        t.Fatalf("expected status 200, got %d", rec.Code)
     }
 }

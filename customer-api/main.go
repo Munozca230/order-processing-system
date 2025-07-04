@@ -1,11 +1,9 @@
 package main
 
 import (
-    "encoding/json"
-    "log"
     "net/http"
 
-    "github.com/gorilla/mux"
+    "github.com/labstack/echo/v4"
 )
 
 type Customer struct {
@@ -14,25 +12,14 @@ type Customer struct {
     Active bool `json:"active"`
 }
 
-func getCustomer(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    id := vars["id"]
-
-    c := Customer{ID: id, Name: "placeholder", Active: true}
-
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(c)
+func getCustomer(c echo.Context) error {
+    id := c.Param("id")
+    customer := Customer{ID: id, Name: "placeholder", Active: true}
+    return c.JSON(http.StatusOK, customer)
 }
 
 func main() {
-    r := mux.NewRouter()
-    r.HandleFunc("/customers/{id}", getCustomer).Methods(http.MethodGet)
-
-    srv := &http.Server{
-        Addr:    ":8080",
-        Handler: r,
-    }
-
-    log.Println("Customer API listening on :8080")
-    log.Fatal(srv.ListenAndServe())
+    e := echo.New()
+    e.GET("/customers/:id", getCustomer)
+    e.Logger.Fatal(e.Start(":8080"))
 }
