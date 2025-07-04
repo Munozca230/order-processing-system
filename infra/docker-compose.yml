@@ -5,6 +5,11 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     ports:
       - "2181:2181"
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka:
     image: bitnami/kafka:3.6
@@ -14,12 +19,33 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     ports:
       - "9092:9092"
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     volumes:
       - kafka-data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  kafka-setup:
+    image: bitnami/kafka:3.6
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: |
+      bash -c "
+        kafka-topics.sh --bootstrap-server kafka:9092 --create --topic orders --partitions 1 --replication-factor 1 --if-not-exists
+        kafka-topics.sh --bootstrap-server kafka:9092 --create --topic orders-retry --partitions 1 --replication-factor 1 --if-not-exists
+        kafka-topics.sh --bootstrap-server kafka:9092 --create --topic orders-dlq --partitions 1 --replication-factor 1 --if-not-exists
+        echo 'Topics created successfully'
+      "
+    restart: "no"
 
   mongo:
     image: mongo:7.0
@@ -27,6 +53,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7.2
@@ -34,10 +65,15 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   order-worker:
     build:
-      context: ../order-worker
+      context: ../services/order-worker
       dockerfile: Dockerfile
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -47,27 +83,40 @@ services:
       - MONGODB_PORT=27017
       - MONGODB_DATABASE=orders
     depends_on:
-      - kafka
-      - mongo
-      - redis
+      kafka:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      product-api:
+        condition: service_started
+      customer-api:
+        condition: service_started
 
   product-api:
     build:
-      context: ../product-api
+      context: ../services/product-api
       dockerfile: Dockerfile
     ports:
       - "8081:8080"
-    depends_on:
-      - kafka
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   customer-api:
     build:
-      context: ../customer-api
+      context: ../services/customer-api
       dockerfile: Dockerfile
     ports:
       - "8082:8080"
-    depends_on:
-      - kafka
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   kafka-data:
