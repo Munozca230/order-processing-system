@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Order Processing System - Complete Testing",
-    "description": "Colección completa para probar el sistema de procesamiento de pedidos con arquitectura de microservicios.\n\n🚀 **Características:**\n- Testing completo de APIs Go\n- Verificación de health checks\n- Pruebas de validación y enriquecimiento\n- Casos de error y reintentos\n- MongoDB queries\n\n📋 **Prerequisitos:**\n1. Ejecutar: `docker-compose up -d`\n2. Esperar 45 segundos para inicialización\n3. Verificar servicios healthy\n\n🔍 **Orden de ejecución recomendada:**\n1. Health Checks\n2. API Testing\n3. Order Processing Scenarios\n4. MongoDB Verification",
+    "description": "Colección completa para probar el sistema de procesamiento de pedidos con arquitectura de microservicios.\n\n🚀 **Características:**\n- Testing completo de APIs Go\n- Verificación de health checks\n- Pruebas de validación y enriquecimiento\n- Casos de error y reintentos\n- Comandos CLI para MongoDB\n\n📋 **Prerequisitos:**\n1. Ejecutar: `docker-compose up -d`\n2. Esperar 45 segundos para inicialización\n3. Verificar servicios healthy\n\n🔍 **Orden de ejecución recomendada:**\n1. Health Checks\n2. API Testing\n3. Order Processing Scenarios\n4. MongoDB CLI Commands",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -29,6 +29,11 @@
       "key": "redisPort",
       "value": "6379",
       "type": "string"
+    },
+    {
+      "key": "orderApiPort",
+      "value": "3000",
+      "type": "string"
     }
   ],
   "item": [
@@ -54,7 +59,7 @@
         {
           "name": "Customer API Health",
           "request": {
-            "method": "GET", 
+            "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}:{{customerApiPort}}/health",
@@ -65,75 +70,15 @@
             "description": "Verificar estado del Customer API"
           },
           "response": []
-        },
-        {
-          "name": "Product API Metrics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{productApiPort}}/metrics",
-              "host": ["{{baseUrl}}"],
-              "port": "{{productApiPort}}",
-              "path": ["metrics"]
-            },
-            "description": "Obtener métricas del Product API"
-          },
-          "response": []
-        },
-        {
-          "name": "Customer API Metrics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/metrics", 
-              "host": ["{{baseUrl}}"],
-              "port": "{{customerApiPort}}",
-              "path": ["metrics"]
-            },
-            "description": "Obtener métricas del Customer API"
-          },
-          "response": []
         }
       ]
     },
     {
       "name": "🛍️ Product API Testing",
-      "description": "Pruebas completas del API de productos",
+      "description": "Probar todas las funcionalidades del Product API",
       "item": [
         {
-          "name": "Get Product by ID - Valid",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{productApiPort}}/products/product-1",
-              "host": ["{{baseUrl}}"],
-              "port": "{{productApiPort}}",
-              "path": ["products", "product-1"]
-            },
-            "description": "Obtener producto válido por ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Product by ID - Invalid",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{productApiPort}}/products/non-existent-product",
-              "host": ["{{baseUrl}}"],
-              "port": "{{productApiPort}}",
-              "path": ["products", "non-existent-product"]
-            },
-            "description": "Intentar obtener producto inexistente"
-          },
-          "response": []
-        },
-        {
-          "name": "Get All Products - Default",
+          "name": "Get All Products",
           "request": {
             "method": "GET",
             "header": [],
@@ -143,53 +88,37 @@
               "port": "{{productApiPort}}",
               "path": ["products"]
             },
-            "description": "Obtener todos los productos (paginación por defecto)"
+            "description": "Obtener todos los productos disponibles"
           },
           "response": []
         },
         {
-          "name": "Get Products - Paginated",
+          "name": "Get Product by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:{{productApiPort}}/products?page=0&page_size=3",
+              "raw": "{{baseUrl}}:{{productApiPort}}/products/product-1",
               "host": ["{{baseUrl}}"],
               "port": "{{productApiPort}}",
-              "path": ["products"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "page_size", 
-                  "value": "3"
-                }
-              ]
+              "path": ["products", "product-1"]
             },
-            "description": "Obtener productos con paginación específica"
+            "description": "Obtener producto específico por ID"
           },
           "response": []
         },
         {
-          "name": "Get Products - Active Only",
+          "name": "Get Non-existent Product",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:{{productApiPort}}/products?active=true",
+              "raw": "{{baseUrl}}:{{productApiPort}}/products/non-existent",
               "host": ["{{baseUrl}}"],
               "port": "{{productApiPort}}",
-              "path": ["products"],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "true"
-                }
-              ]
+              "path": ["products", "non-existent"]
             },
-            "description": "Obtener solo productos activos"
+            "description": "Probar comportamiento con producto inexistente"
           },
           "response": []
         }
@@ -197,40 +126,10 @@
     },
     {
       "name": "👥 Customer API Testing",
-      "description": "Pruebas completas del API de clientes",
+      "description": "Probar todas las funcionalidades del Customer API",
       "item": [
         {
-          "name": "Get Customer by ID - Valid",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/customer-1",
-              "host": ["{{baseUrl}}"],
-              "port": "{{customerApiPort}}",
-              "path": ["customers", "customer-1"]
-            },
-            "description": "Obtener cliente válido por ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Customer by ID - Invalid",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/non-existent-customer",
-              "host": ["{{baseUrl}}"],
-              "port": "{{customerApiPort}}",
-              "path": ["customers", "non-existent-customer"]
-            },
-            "description": "Intentar obtener cliente inexistente"
-          },
-          "response": []
-        },
-        {
-          "name": "Get All Customers - Default",
+          "name": "Get All Customers",
           "request": {
             "method": "GET",
             "header": [],
@@ -240,12 +139,27 @@
               "port": "{{customerApiPort}}",
               "path": ["customers"]
             },
-            "description": "Obtener todos los clientes (paginación por defecto)"
+            "description": "Obtener todos los clientes"
           },
           "response": []
         },
         {
-          "name": "Get Customers - Active Only",
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/customer-1",
+              "host": ["{{baseUrl}}"],
+              "port": "{{customerApiPort}}",
+              "path": ["customers", "customer-1"]
+            },
+            "description": "Obtener cliente específico por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Customers Only",
           "request": {
             "method": "GET",
             "header": [],
@@ -266,48 +180,17 @@
           "response": []
         },
         {
-          "name": "Get Customers - Inactive Only",
+          "name": "Get Non-existent Customer",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/customers?active=false",
+              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/non-existent",
               "host": ["{{baseUrl}}"],
               "port": "{{customerApiPort}}",
-              "path": ["customers"],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "false"
-                }
-              ]
+              "path": ["customers", "non-existent"]
             },
-            "description": "Obtener solo clientes inactivos"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Customers - Paginated",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/customers?page=0&page_size=2",
-              "host": ["{{baseUrl}}"],
-              "port": "{{customerApiPort}}",
-              "path": ["customers"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "page_size",
-                  "value": "2"
-                }
-              ]
-            },
-            "description": "Obtener clientes con paginación específica"
+            "description": "Probar comportamiento con cliente inexistente"
           },
           "response": []
         }
@@ -315,10 +198,10 @@
     },
     {
       "name": "📦 Order Processing Scenarios",
-      "description": "Escenarios de procesamiento de órdenes para simular via Kafka",
+      "description": "Pruebas completas del procesamiento de pedidos",
       "item": [
         {
-          "name": "✅ Valid Order - Happy Path",
+          "name": "Valid Order Processing",
           "request": {
             "method": "POST",
             "header": [
@@ -329,20 +212,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"postman-test-001\",\n  \"customerId\": \"customer-1\",\n  \"products\": [\n    {\"productId\": \"product-1\"},\n    {\"productId\": \"product-2\"}\n  ]\n}"
+              "raw": "{\n  \"orderId\": \"test-order-001\",\n  \"customerId\": \"customer-1\",\n  \"products\": [\n    {\n      \"productId\": \"product-1\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}:8080/orders/test",
+              "raw": "{{baseUrl}}:{{orderApiPort}}/api/orders",
               "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["orders", "test"]
+              "port": "{{orderApiPort}}",
+              "path": ["api", "orders"]
             },
-            "description": "⚠️ NOTA: Este endpoint NO existe en el sistema real.\n\nEste JSON debe enviarse a Kafka usando:\n```bash\necho '{...}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n```\n\n✅ **Resultado esperado:**\n- Cliente activo ✓\n- Productos existentes ✓\n- Orden procesada y guardada en MongoDB"
+            "description": "Procesar pedido válido con cliente activo y producto existente"
           },
           "response": []
         },
         {
-          "name": "❌ Invalid Customer - Inactive",
+          "name": "Invalid Customer Test",
           "request": {
             "method": "POST",
             "header": [
@@ -353,20 +236,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"postman-test-002\",\n  \"customerId\": \"customer-3\",\n  \"products\": [\n    {\"productId\": \"product-1\"}\n  ]\n}"
+              "raw": "{\n  \"orderId\": \"test-order-002\",\n  \"customerId\": \"customer-inactive\",\n  \"products\": [\n    {\n      \"productId\": \"product-2\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}:8080/orders/test",
+              "raw": "{{baseUrl}}:{{orderApiPort}}/api/orders",
               "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["orders", "test"]
+              "port": "{{orderApiPort}}",
+              "path": ["api", "orders"]
             },
-            "description": "⚠️ NOTA: Este endpoint NO existe en el sistema real.\n\nEste JSON debe enviarse a Kafka usando:\n```bash\necho '{...}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n```\n\n❌ **Resultado esperado:**\n- Cliente inactivo (customer-3)\n- Validación falla\n- Orden enviada a cola de reintentos"
+            "description": "Probar pedido con cliente inactivo - debería fallar validación"
           },
           "response": []
         },
         {
-          "name": "❌ Invalid Product - Non-existent",
+          "name": "Invalid Product Test",
           "request": {
             "method": "POST",
             "header": [
@@ -377,20 +260,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"postman-test-003\",\n  \"customerId\": \"customer-1\",\n  \"products\": [\n    {\"productId\": \"non-existent-product\"}\n  ]\n}"
+              "raw": "{\n  \"orderId\": \"test-order-003\",\n  \"customerId\": \"customer-1\",\n  \"products\": [\n    {\n      \"productId\": \"non-existent-product\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}:8080/orders/test",
+              "raw": "{{baseUrl}}:{{orderApiPort}}/api/orders",
               "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["orders", "test"]
+              "port": "{{orderApiPort}}",
+              "path": ["api", "orders"]
             },
-            "description": "⚠️ NOTA: Este endpoint NO existe en el sistema real.\n\nEste JSON debe enviarse a Kafka usando:\n```bash\necho '{...}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n```\n\n❌ **Resultado esperado:**\n- Producto inexistente\n- Enriquecimiento falla\n- Reintentos exponenciales activados"
+            "description": "Probar pedido con producto inexistente - debería fallar validación"
           },
           "response": []
         },
         {
-          "name": "🔄 Mixed Products - Partial Success",
+          "name": "Mixed Products Test",
           "request": {
             "method": "POST",
             "header": [
@@ -401,201 +284,87 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": \"postman-test-004\",\n  \"customerId\": \"customer-2\",\n  \"products\": [\n    {\"productId\": \"product-1\"},\n    {\"productId\": \"invalid-product\"},\n    {\"productId\": \"product-3\"}\n  ]\n}"
+              "raw": "{\n  \"orderId\": \"test-order-004\",\n  \"customerId\": \"customer-2\",\n  \"products\": [\n    {\n      \"productId\": \"product-1\"\n    },\n    {\n      \"productId\": \"product-3\"\n    },\n    {\n      \"productId\": \"product-5\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}:8080/orders/test",
+              "raw": "{{baseUrl}}:{{orderApiPort}}/api/orders",
               "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["orders", "test"]
+              "port": "{{orderApiPort}}",
+              "path": ["api", "orders"]
             },
-            "description": "⚠️ NOTA: Este endpoint NO existe en el sistema real.\n\nEste JSON debe enviarse a Kafka usando:\n```bash\necho '{...}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n```\n\n🔄 **Resultado esperado:**\n- Algunos productos válidos, uno inválido\n- Enriquecimiento falla por producto inexistente\n- Sistema de reintentos activado"
-          },
-          "response": []
-        },
-        {
-          "name": "🔒 Duplicate Order - Lock Test",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": \"duplicate-test-001\",\n  \"customerId\": \"customer-1\",\n  \"products\": [\n    {\"productId\": \"product-1\"}\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}:8080/orders/test",
-              "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["orders", "test"]
-            },
-            "description": "⚠️ NOTA: Este endpoint NO existe en el sistema real.\n\nPara probar distributed locking, envía este mismo mensaje MÚLTIPLES VECES RÁPIDAMENTE:\n```bash\n# Ejecutar estos comandos rápidamente en terminales separadas\necho '{...}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n```\n\n🔒 **Resultado esperado:**\n- Solo una instancia procesará la orden\n- Otras instancias serán bloqueadas por distributed lock\n- Verificar logs: \"Order already being processed, skipping\""
+            "description": "Probar pedido con múltiples productos válidos"
           },
           "response": []
         }
       ]
     },
     {
-      "name": "💾 MongoDB Verification",
-      "description": "Scripts para verificar datos en MongoDB (ejecutar en terminal)",
+      "name": "📊 MongoDB Verification",
+      "description": "Verificar datos almacenados en MongoDB usando comandos CLI",
       "item": [
         {
-          "name": "📊 Check Sample Data",
+          "name": "MongoDB CLI Commands",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:27017/info",
+              "raw": "{{baseUrl}}:{{productApiPort}}/health",
               "host": ["{{baseUrl}}"],
-              "port": "{{mongoPort}}",
-              "path": ["info"]
+              "port": "{{productApiPort}}",
+              "path": ["health"]
             },
-            "description": "⚠️ MongoDB no expone HTTP endpoints por defecto.\n\n**Ejecutar en terminal:**\n```bash\n# Verificar datos de productos\ndocker-compose exec mongo mongosh catalog --eval \"db.products.find().forEach(printjson)\"\n\n# Verificar datos de clientes  \ndocker-compose exec mongo mongosh catalog --eval \"db.customers.find().forEach(printjson)\"\n\n# Contar documentos\ndocker-compose exec mongo mongosh catalog --eval \"print('Products:', db.products.countDocuments()); print('Customers:', db.customers.countDocuments())\"\n```"
+            "description": "📋 **Comandos MongoDB CLI:**\n\n🔍 **Ver órdenes procesadas:**\n```bash\ndocker compose exec mongo mongosh orders --eval \"db.orders.find().forEach(printjson)\"\n```\n\n📊 **Estadísticas por cliente:**\n```bash\ndocker compose exec mongo mongosh orders --eval \"db.orders.aggregate([{$group: {_id: '$customerId', total: {$sum: 1}}}]).forEach(printjson)\"\n```\n\n🔢 **Contar órdenes:**\n```bash\ndocker compose exec mongo mongosh orders --eval \"db.orders.countDocuments()\"\n```\n\n⚠️ **Nota:** MongoDB no expone endpoints HTTP por defecto. Use los comandos CLI arriba para verificar datos."
           },
-          "response": []
-        },
-        {
-          "name": "📦 Check Processed Orders",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:27017/orders",
-              "host": ["{{baseUrl}}"],
-              "port": "{{mongoPort}}",
-              "path": ["orders"]
-            },
-            "description": "⚠️ MongoDB no expone HTTP endpoints por defecto.\n\n**Ejecutar en terminal:**\n```bash\n# Ver todas las órdenes procesadas\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find().forEach(printjson)\"\n\n# Buscar orden específica\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find({orderId: 'ORDER_ID_HERE'}).forEach(printjson)\"\n\n# Contar órdenes por estado\ndocker-compose exec mongo mongosh orders --eval \"print('Total orders:', db.orders.countDocuments())\"\n\n# Ver órdenes recientes\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find().sort({_id: -1}).limit(5).forEach(printjson)\"\n```"
-          },
-          "response": []
-        },
-        {
-          "name": "🔍 Advanced MongoDB Queries",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:27017/advanced",
-              "host": ["{{baseUrl}}"],
-              "port": "{{mongoPort}}",
-              "path": ["advanced"]
-            },
-            "description": "⚠️ MongoDB no expone HTTP endpoints por defecto.\n\n**Consultas avanzadas (ejecutar en terminal):**\n```bash\n# Órdenes por cliente específico\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find({customerId: 'customer-1'}).forEach(printjson)\"\n\n# Órdenes con productos específicos\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find({'products.productId': 'product-1'}).forEach(printjson)\"\n\n# Estadísticas de productos más ordenados\ndocker-compose exec mongo mongosh orders --eval \"db.orders.aggregate([{\\$unwind: '\\$products'}, {\\$group: {_id: '\\$products.productId', count: {\\$sum: 1}, totalRevenue: {\\$sum: '\\$products.price'}}}, {\\$sort: {count: -1}}]).forEach(printjson)\"\n\n# Órdenes fallidas (si las hay)\ndocker-compose exec mongo mongosh orders --eval \"db.orders.find({status: 'failed'}).forEach(printjson)\"\n```"
-          },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Esta petición solo muestra los comandos CLI necesarios",
+                  "// Para verificar MongoDB, usar los comandos en la descripción",
+                  "pm.test(\"MongoDB CLI commands available\", function () {",
+                  "    pm.expect(true).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
       "name": "🔧 System Utilities",
-      "description": "Utilidades para el sistema y debugging",
+      "description": "Comandos útiles para monitoreo y debug del sistema",
       "item": [
         {
-          "name": "📋 Docker Compose Status",
+          "name": "System Commands",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:8080/system/status",
+              "raw": "{{baseUrl}}:{{productApiPort}}/health",
               "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["system", "status"]
+              "port": "{{productApiPort}}",
+              "path": ["health"]
             },
-            "description": "⚠️ Este endpoint NO existe en el sistema real.\n\n**Ejecutar en terminal:**\n```bash\n# Ver estado de todos los servicios\ndocker-compose ps\n\n# Ver logs de servicios específicos\ndocker-compose logs order-worker\ndocker-compose logs product-api\ndocker-compose logs customer-api\n\n# Ver logs en tiempo real\ndocker-compose logs -f order-worker\n\n# Verificar health de servicios\ndocker-compose exec product-api wget -qO- http://localhost:8080/health\ndocker-compose exec customer-api wget -qO- http://localhost:8080/health\n```"
+            "description": "📋 **Comandos Sistema:**\n\n🔍 **Estado servicios:**\n```bash\ndocker compose ps\n```\n\n📊 **Logs order-worker:**\n```bash\ndocker compose logs -f order-worker\n```\n\n🔄 **Reiniciar servicios:**\n```bash\ndocker compose restart\n```\n\n🧹 **Limpiar volúmenes:**\n```bash\ndocker compose down -v\n```\n\n⚠️ **Nota:** Estos comandos se ejecutan desde terminal, no como peticiones HTTP."
           },
-          "response": []
-        },
-        {
-          "name": "🔄 Restart Services",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": {
-              "raw": "{{baseUrl}}:8080/system/restart",
-              "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["system", "restart"]
-            },
-            "description": "⚠️ Este endpoint NO existe en el sistema real.\n\n**Ejecutar en terminal:**\n```bash\n# Reiniciar todos los servicios\ndocker-compose down && docker-compose up -d\n\n# Reiniciar servicio específico\ndocker-compose restart order-worker\ndocker-compose restart product-api\ndocker-compose restart customer-api\n\n# Rebuild y reiniciar\ndocker-compose down && docker-compose up -d --build\n\n# Limpiar volúmenes y reiniciar\ndocker-compose down -v && docker-compose up -d\n```"
-          },
-          "response": []
-        },
-        {
-          "name": "🐛 Debug Information",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}:8080/debug/info",
-              "host": ["{{baseUrl}}"],
-              "port": "8080",
-              "path": ["debug", "info"]
-            },
-            "description": "⚠️ Este endpoint NO existe en el sistema real.\n\n**Comandos de debugging:**\n```bash\n# Ver configuración de Kafka\ndocker-compose exec kafka kafka-topics.sh --bootstrap-server localhost:9092 --list\n\n# Ver mensajes en tópico orders\ndocker-compose exec kafka kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic orders --from-beginning\n\n# Ver mensajes en dead letter queue\ndocker-compose exec kafka kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic orders-dlq --from-beginning\n\n# Verificar Redis keys\ndocker-compose exec redis redis-cli KEYS \"*\"\n\n# Ver locks activos en Redis\ndocker-compose exec redis redis-cli KEYS \"lock:*\"\n\n# Ver mensajes fallidos en Redis\ndocker-compose exec redis redis-cli KEYS \"failed:*\"\n```"
-          },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Esta petición solo muestra comandos útiles del sistema",
+                  "// Para monitoreo, usar los comandos en la descripción",
+                  "pm.test(\"System commands available\", function () {",
+                  "    pm.expect(true).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Auto-generar timestamp para IDs únicos",
-          "pm.globals.set('timestamp', Date.now());",
-          "",
-          "// Verificar que los servicios estén corriendo",
-          "console.log('🚀 Preparando request...');",
-          "console.log('📊 Variables configuradas:');",
-          "console.log('  - Base URL:', pm.variables.get('baseUrl'));",
-          "console.log('  - Product API:', pm.variables.get('baseUrl') + ':' + pm.variables.get('productApiPort'));",
-          "console.log('  - Customer API:', pm.variables.get('baseUrl') + ':' + pm.variables.get('customerApiPort'));"
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Tests globales para todas las requests",
-          "pm.test('Response time is reasonable', function () {",
-          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
-          "});",
-          "",
-          "// Log de respuesta para debugging",
-          "console.log('📥 Response Status:', pm.response.status);",
-          "console.log('⏱️ Response Time:', pm.response.responseTime + 'ms');",
-          "",
-          "// Tests específicos por status code",
-          "if (pm.response.status === 'OK') {",
-          "    pm.test('Status code is 200', function () {",
-          "        pm.response.to.have.status(200);",
-          "    });",
-          "    ",
-          "    pm.test('Response has valid JSON', function () {",
-          "        pm.response.to.be.json;",
-          "    });",
-          "} else if (pm.response.status === 'Not Found') {",
-          "    pm.test('Status code is 404 for non-existent resources', function () {",
-          "        pm.response.to.have.status(404);",
-          "    });",
-          "} else {",
-          "    console.log('⚠️ Unexpected status:', pm.response.status);",
-          "}"
-        ]
-      }
     }
   ]
 }

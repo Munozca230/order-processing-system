@@ -444,7 +444,7 @@ graph TB
         subgraph "🔍 Development Tools"
             TESTCONTAINERS[🧪 Testcontainers<br/>📋 Integration testing<br/>📊 Real environment simulation<br/>🎯 Test automation]
             
-            POSTMAN_COLLECTION[📮 Postman Collection<br/>📋 API testing suite<br/>📊 67 test scenarios<br/>🎯 Quality assurance]
+            POSTMAN_COLLECTION[📮 Postman Collection<br/>📋 API testing suite<br/>📊 Functional APIs + CLI commands<br/>🎯 Quality assurance]
         end
     end
 
@@ -655,14 +655,15 @@ scripts/test-package-change.ps1  # Test cambio de paquetes Java
 scripts/clean-restart.ps1         # Limpieza manual
 ```
 
-### **📮 Postman Collection (67 requests)**
+### **📮 Postman Collection**
 
 **Carpetas organizadas**:
 - 🏥 Health Checks (verificación de servicios)
 - 🛍️ Product API Testing (CRUD productos)
 - 👥 Customer API Testing (CRUD clientes)
-- 📦 Order Processing Scenarios (casos de éxito y error)
-- 💾 MongoDB Verification (scripts de verificación)
+- 📦 Order Processing Scenarios (puerto 3000/api/orders)
+- 📊 MongoDB CLI Commands (comandos shell para verificación)
+- 🔧 System Utilities (comandos Docker para monitoreo)
 
 ### **🔍 Casos de Test Incluidos**
 
