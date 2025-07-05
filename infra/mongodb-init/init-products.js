@@ -64,6 +64,50 @@ const products = [
     updatedAt: new Date()
   },
   {
+    productId: 'product-6',
+    name: 'SSD NVMe 1TB Samsung',
+    description: 'High-speed NVMe SSD for ultra-fast data transfer',
+    price: 149.99,
+    category: 'storage',
+    stock: 25,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    productId: 'product-7',
+    name: 'Webcam 4K Logitech',
+    description: 'Ultra HD webcam for streaming and video calls',
+    price: 199.99,
+    category: 'peripherals',
+    stock: 35,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    productId: 'product-8',
+    name: 'Tarjeta Gráfica RTX 4060',
+    description: 'High-performance graphics card for gaming',
+    price: 899.99,
+    category: 'components',
+    stock: 10,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    productId: 'product-9',
+    name: 'Silla Gaming Ergonómica',
+    description: 'Ergonomic gaming chair with lumbar support',
+    price: 299.99,
+    category: 'furniture',
+    stock: 15,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
     productId: 'product-error',
     name: 'Producto que causa error',
     description: 'Test product that simulates errors',
