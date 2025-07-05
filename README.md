@@ -8,13 +8,23 @@ Sistema enterprise de procesamiento de órdenes con **Java 21**, **Go APIs**, **
 
 ## ⚡ **Quick Start (2 minutos)**
 
-### **🎯 Opción 1: Solo Backend (Desarrollo)**
-```bash
-git clone <repository-url>
-cd order-processing-system
-scripts/deploy-backend.ps1
+### **🚀 Primera vez (Setup inicial)**
+```powershell
+scripts/deploy-frontend.ps1
 ```
-**Resultado**: APIs Go + Worker Java + Infraestructura
+
+### **🔄 Después de hacer git pull**
+```powershell
+scripts/fresh-start.ps1
+```
+
+### **🆘 Cuando algo está roto**
+```powershell
+scripts/dev-reset.ps1
+```
+
+**Resultado**: Sistema completo con frontend dinámico
+- Frontend: http://localhost:8080
 - Product API: http://localhost:8081
 - Customer API: http://localhost:8082
 
@@ -105,7 +115,9 @@ graph TB
 ### **Servicios no inician**
 ```bash
 docker-compose down -v && docker-compose up -d
-# Esperar 45 segundos
+# Esperar ~30 segundos para health checks optimizados
+# Todos los servicios deben mostrar "Healthy"
+docker-compose ps
 ```
 
 ### **MongoDB sin datos**

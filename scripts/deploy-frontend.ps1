@@ -108,8 +108,37 @@ try {
 }
 
 # Wait for services to be ready
-Write-Host "`nWaiting for services to be healthy (60 seconds)..." -ForegroundColor Yellow
-Start-Sleep -Seconds 60
+Write-Host "`nWaiting for services to be healthy..." -ForegroundColor Yellow
+$maxWait = 60
+$waited = 0
+$checkInterval = 5
+
+do {
+    Start-Sleep -Seconds $checkInterval
+    $waited += $checkInterval
+    
+    try {
+        $status = docker-compose ps --format "table {{.Name}}\t{{.Status}}"
+        $healthyCount = ($status | Select-String "healthy").Count
+        $startedCount = ($status | Select-String "\(Started\)|\(healthy\)").Count
+        
+        # Count services that should have health checks (excluding kafka-setup which is one-time)
+        $totalServices = ($status | Select-String -NotMatch "kafka-setup").Count - 1  # -1 for header line
+        
+        if ($healthyCount -eq $totalServices) {
+            Write-Host "All services are healthy!" -ForegroundColor Green
+            break
+        } else {
+            Write-Host "Healthy: $healthyCount/$totalServices (waited ${waited}s)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "Checking service status... (waited ${waited}s)" -ForegroundColor Yellow
+    }
+} while ($waited -lt $maxWait)
+
+if ($waited -ge $maxWait) {
+    Write-Host "Timeout reached. Some services may still be starting." -ForegroundColor Yellow
+}
 
 # Check service status
 Write-Host "`nChecking service status..." -ForegroundColor Cyan

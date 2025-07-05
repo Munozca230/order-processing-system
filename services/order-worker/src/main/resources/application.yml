@@ -11,6 +11,10 @@ app:
     max-memory-size: 1MB
 
 spring:
+  main:
+    web-application-type: reactive
+  webflux:
+    base-path: /
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -26,3 +30,18 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 8080

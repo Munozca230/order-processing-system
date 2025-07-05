@@ -120,15 +120,15 @@ const products = [
   }
 ];
 
-// Insert products
-const result = db.products.insertMany(products);
+// Insert products with bulk operation
+const result = db.products.insertMany(products, {ordered: false});
 print(`✅ Inserted ${result.insertedIds.length} products`);
 
-// Create indexes for performance
-db.products.createIndex({ productId: 1 }, { unique: true });
-db.products.createIndex({ category: 1 });
-db.products.createIndex({ active: 1 });
-db.products.createIndex({ price: 1 });
+// Create indexes in parallel (background)
+db.products.createIndex({ productId: 1 }, { unique: true, background: true });
+db.products.createIndex({ category: 1 }, { background: true });
+db.products.createIndex({ active: 1 }, { background: true });
+db.products.createIndex({ price: 1 }, { background: true });
 
 print('📊 Created indexes: productId (unique), category, active, price');
 

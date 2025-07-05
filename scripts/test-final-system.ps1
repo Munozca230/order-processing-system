@@ -12,8 +12,32 @@ Write-Host "2. Starting all services..." -ForegroundColor Yellow
 docker-compose up -d
 
 # Wait for initialization
-Write-Host "3. Waiting for MongoDB initialization..." -ForegroundColor Yellow
-Start-Sleep -Seconds 45
+Write-Host "3. Waiting for services to be healthy..." -ForegroundColor Yellow
+$maxWait = 45
+$waited = 0
+$checkInterval = 5
+
+do {
+    Start-Sleep -Seconds $checkInterval
+    $waited += $checkInterval
+    
+    try {
+        $status = docker-compose ps --format "table {{.Name}}\t{{.Status}}"
+        $healthyCount = ($status | Select-String "healthy").Count
+        
+        # Count services that should have health checks (excluding kafka-setup which is one-time)
+        $totalServices = ($status | Select-String -NotMatch "kafka-setup").Count - 1  # -1 for header line
+        
+        if ($healthyCount -eq $totalServices) {
+            Write-Host "All services are healthy!" -ForegroundColor Green
+            break
+        } else {
+            Write-Host "Healthy: $healthyCount/$totalServices (waited ${waited}s)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "Checking service status... (waited ${waited}s)" -ForegroundColor Yellow
+    }
+} while ($waited -lt $maxWait)
 
 # Verify MongoDB data
 Write-Host "4. Verifying MongoDB initialization..." -ForegroundColor Yellow

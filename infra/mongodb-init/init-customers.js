@@ -183,16 +183,16 @@ const customers = [
   }
 ];
 
-// Insert customers
-const result = db.customers.insertMany(customers);
+// Insert customers with bulk operation
+const result = db.customers.insertMany(customers, {ordered: false});
 print(`✅ Inserted ${result.insertedIds.length} customers`);
 
-// Create indexes for performance
-db.customers.createIndex({ customerId: 1 }, { unique: true });
-db.customers.createIndex({ email: 1 }, { unique: true });
-db.customers.createIndex({ active: 1 });
-db.customers.createIndex({ customerTier: 1 });
-db.customers.createIndex({ registrationDate: 1 });
+// Create indexes in parallel (background)
+db.customers.createIndex({ customerId: 1 }, { unique: true, background: true });
+db.customers.createIndex({ email: 1 }, { unique: true, background: true });
+db.customers.createIndex({ active: 1 }, { background: true });
+db.customers.createIndex({ customerTier: 1 }, { background: true });
+db.customers.createIndex({ registrationDate: 1 }, { background: true });
 
 print('📊 Created indexes: customerId (unique), email (unique), active, customerTier, registrationDate');
 
