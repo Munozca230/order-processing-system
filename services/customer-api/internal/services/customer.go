@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
-
+	
 	"github.com/customer-api-v2/configs"
 	"github.com/customer-api-v2/internal/models"
 	"github.com/customer-api-v2/internal/repository"
