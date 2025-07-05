@@ -43,7 +43,7 @@
 ### **📨 Capa Message Broker (Todos los perfiles)**
 - **Zookeeper** (bitnami/zookeeper:3.9) - Puerto 2181 - Coordinación cluster
 - **Kafka** (bitnami/kafka:3.6) - Puerto 9092 - Event streaming
-- **Topics**: `orders`, `orders-retry`, `orders-dlq`
+- **Topics**: orders, orders_retry, orders_dlq
 
 ### **⚙️ Capa Procesamiento Principal (Todos los perfiles)**
 - **Order Worker** (Java 21 + Spring WebFlux) - Package: com.orderprocessing
@@ -67,216 +67,83 @@
 ### **🔍 Diagrama Principal - Vista Completa**
 
 ```mermaid
-graph TB
-    %% User Interfaces Layer
-    subgraph "🌐 Capa de Interfaces de Usuario"
-        U[👤 Usuario Final]
-        BROWSER[🌐 Navegador Web<br/>Chrome/Firefox/Safari]
-        POSTMAN[📮 Postman<br/>API Testing Tool]
-        CLI_USER[⌨️ Command Line<br/>PowerShell/Terminal]
+graph LR
+    %% === USER LAYER ===
+    subgraph "👤 Users"
+        USER[👤 End User<br/>Web Browser]
+        DEV[�‍💻 Developer<br/>Postman/CLI]
     end
 
-    %% Frontend Layer
-    subgraph "🎨 Capa de Frontend"
-        NGINX[🌐 Nginx Frontend<br/>📦 nginx:alpine<br/>🔧 Puerto: 8080<br/>📋 Proxy + Static Files]
-        
-        subgraph "📱 Frontend Components"
-            HTML[📄 HTML Interface<br/>🔧 Responsive Design<br/>📊 Real-time Status]
-            CSS[🎨 CSS Styling<br/>🔧 Modern UI/UX<br/>📊 Green/Yellow/Red States]
-            JS[⚡ JavaScript Logic<br/>🔧 API Integration<br/>📊 Auto Order ID Generation]
-        end
+    %% === FRONTEND LAYER ===
+    subgraph "� Frontend Layer"
+        NGINX[🌐 Nginx<br/>📦 nginx:alpine<br/>� Port: 8080]
+        WEB[📱 SPA Frontend<br/>HTML + CSS + JS<br/>🔧 Auto Order IDs]
     end
 
-    %% API Gateway Layer
-    subgraph "🚪 Capa de Gateway"
-        ORDER_API[📨 Order API<br/>🟢 Node.js 18 + Express<br/>📦 Puerto: 3000<br/>🔧 Kafka Producer Bridge<br/>📊 JSON Validation]
+    %% === API GATEWAY LAYER ===
+    subgraph "🚪 API Gateway"
+        ORDER_API[📨 Order API<br/>🟢 Node.js + Express<br/>� Port: 3000<br/>🔧 Kafka Producer]
     end
 
-    %% Message Broker Layer
-    subgraph "📨 Capa de Message Broker"
-        ZK[🐘 Zookeeper<br/>📦 bitnami/zookeeper:3.9<br/>🔧 Puerto: 2181<br/>📋 Cluster Coordination<br/>🎯 Leader Election]
-        
-        KAFKA[📨 Kafka Broker<br/>📦 bitnami/kafka:3.6<br/>🔧 Puerto: 9092<br/>📋 Message Streaming<br/>🎯 Event Distribution]
-        
-        subgraph "📋 Kafka Topics"
-            T_ORDERS[📥 orders<br/>🔧 Main Topic<br/>📊 Partitions: 1]
-            T_RETRY[🔄 orders-retry<br/>🔧 Retry Topic<br/>📊 Exponential Backoff]
-            T_DLQ[💀 orders-dlq<br/>🔧 Dead Letter Queue<br/>📊 Failed Messages]
-        end
+    %% === MESSAGE BROKER ===
+    subgraph "📨 Message Broker"
+        KAFKA[📨 Apache Kafka<br/>📦 bitnami/kafka:3.6<br/>� Port: 9092]
+        TOPICS[📋 Topics<br/>• orders<br/>• orders_retry<br/>• orders_dlq]
     end
 
-    %% Core Processing Layer
-    subgraph "⚙️ Capa de Procesamiento Principal"
-        ORDER_WORKER[☕ Order Worker<br/>📦 Java 21 + Spring WebFlux<br/>🔧 Reactive Programming<br/>📋 Package: com.orderprocessing<br/>📊 Kafka Consumer Group]
-        
-        subgraph "🧠 Worker Internal Components"
-            CONSUMER[📥 Kafka Consumer<br/>🔧 @KafkaListener<br/>📊 Group: order-worker-group<br/>🎯 Message Consumption]
-            
-            ENRICHMENT[🔍 Enrichment Service<br/>🔧 WebClient Reactive<br/>📊 Product & Customer APIs<br/>🎯 Data Enhancement]
-            
-            VALIDATION[✅ Validation Service<br/>🔧 Business Rules Engine<br/>📊 Active Customer Check<br/>🎯 Data Validation]
-            
-            RETRY[🔄 Retry Service<br/>🔧 Exponential Backoff<br/>📊 Redis-backed Storage<br/>🎯 Failure Recovery]
-            
-            LOCK[🔒 Lock Service<br/>🔧 Distributed Locking<br/>📊 Redis-based Concurrency<br/>🎯 Duplicate Prevention]
-        end
+    %% === CORE PROCESSING ===
+    subgraph "⚙️ Core Processing"
+        WORKER[☕ Order Worker<br/>📦 Java 21 + WebFlux<br/>🔧 Reactive Consumer<br/>📊 Event Processing]
     end
 
-    %% External APIs Layer
-    subgraph "🌍 Capa de APIs Externas (Clean Architecture)"
-        PRODUCT_API[🛍️ Product API<br/>🟢 Go 1.22 + Echo<br/>📦 Puerto: 8081<br/>🔧 RESTful Service<br/>📋 Clean Architecture]
-        
-        subgraph "🛍️ Product API Layers"
-            P_HANDLERS[📡 Handlers Layer<br/>🔧 HTTP Controllers<br/>📊 Request/Response<br/>🎯 API Endpoints]
-            P_SERVICES[💼 Services Layer<br/>🔧 Business Logic<br/>📊 Domain Rules<br/>🎯 Core Operations]
-            P_REPO[💾 Repository Layer<br/>🔧 Data Access<br/>📊 MongoDB Operations<br/>🎯 Persistence]
-            P_MODELS[📋 Models Layer<br/>🔧 Domain Objects<br/>📊 Data Structures<br/>🎯 Entity Definitions]
-            P_MIDDLEWARE[🛡️ Middleware Layer<br/>🔧 Cross-cutting<br/>📊 Logging, CORS<br/>🎯 Request Processing]
-        end
-        
-        CUSTOMER_API[👥 Customer API<br/>🟢 Go 1.22 + Echo<br/>📦 Puerto: 8082<br/>🔧 RESTful Service<br/>📋 Clean Architecture]
-        
-        subgraph "👥 Customer API Layers"
-            C_HANDLERS[📡 Handlers Layer<br/>🔧 HTTP Controllers<br/>📊 Request/Response<br/>🎯 API Endpoints]
-            C_SERVICES[💼 Services Layer<br/>🔧 Business Logic<br/>📊 Active Status Check<br/>🎯 Core Operations]
-            C_REPO[💾 Repository Layer<br/>🔧 Data Access<br/>📊 MongoDB Operations<br/>🎯 Persistence]
-            C_MODELS[📋 Models Layer<br/>🔧 Domain Objects<br/>📊 Data Structures<br/>🎯 Entity Definitions]
-            C_MIDDLEWARE[🛡️ Middleware Layer<br/>🔧 Cross-cutting<br/>📊 Logging, CORS<br/>🎯 Request Processing]
-        end
+    %% === EXTERNAL APIS ===
+    subgraph "🌍 External APIs"
+        PRODUCT_API[🛍️ Product API<br/>� Go + Echo<br/>� Port: 8081]
+        CUSTOMER_API[👥 Customer API<br/>� Go + Echo<br/>� Port: 8082]
     end
 
-    %% Data Storage Layer
-    subgraph "💾 Capa de Almacenamiento de Datos"
-        MONGODB[💾 MongoDB<br/>📦 mongo:7.0<br/>🔧 Puerto: 27017<br/>📋 Document Database<br/>📊 NoSQL Storage]
-        
-        subgraph "📂 MongoDB Databases"
-            DB_CATALOG[📚 catalog<br/>🔧 Reference Data<br/>📊 Products & Customers<br/>🎯 Master Data]
-            DB_ORDERS[📋 orders<br/>🔧 Processed Orders<br/>📊 Enriched Documents<br/>🎯 Business Data]
-        end
-        
-        REDIS[⚡ Redis<br/>📦 redis:7.2<br/>🔧 Puerto: 6379<br/>📋 In-Memory Store<br/>📊 Cache & Locks]
-        
-        subgraph "🔧 Redis Use Cases"
-            R_LOCKS[🔒 Distributed Locks<br/>🔧 order:lock:{orderId}<br/>📊 TTL: 60 seconds<br/>🎯 Concurrency Control]
-            R_RETRY[🔄 Retry Queue<br/>🔧 failed:{messageId}<br/>📊 Exponential Delays<br/>🎯 Failure Management]
-            R_CACHE[📊 Cache Layer<br/>🔧 Performance Cache<br/>📊 Optional Feature<br/>🎯 Speed Optimization]
-        end
+    %% === DATA STORAGE ===
+    subgraph "💾 Data Storage"
+        MONGO[💾 MongoDB<br/>📦 mongo:7.0<br/>� Port: 27017<br/>📊 Orders + Catalog]
+        REDIS[⚡ Redis<br/>📦 redis:7.2<br/>� Port: 6379<br/> Locks + Cache]
     end
 
-    %% Data Initialization Layer
-    subgraph "🚀 Capa de Inicialización"
-        MONGO_INIT[📋 MongoDB Init Scripts<br/>📦 JavaScript Files<br/>🔧 Container Startup<br/>📊 Sample Data Population]
-        
-        subgraph "📄 Initialization Scripts"
-            INIT_PRODUCTS[📦 init-products.js<br/>🔧 6 Sample Products<br/>📊 Realistic Catalog Data<br/>🎯 Demo Environment]
-            INIT_CUSTOMERS[👥 init-customers.js<br/>🔧 6 Sample Customers<br/>📊 Active/Inactive States<br/>🎯 Test Scenarios]
-        end
-    end
-
-    %% Monitoring Layer
-    subgraph "📊 Capa de Observabilidad"
-        LOGGING[📝 Structured Logging<br/>🔧 JSON Format + Emojis<br/>📊 Distributed Tracing Ready<br/>🎯 Operational Visibility]
-        
-        HEALTH[🏥 Health Checks<br/>🔧 /health endpoints<br/>📊 Docker Integration<br/>🎯 Service Monitoring]
-        
-        METRICS[📈 Metrics Collection<br/>🔧 /metrics endpoints<br/>📊 Prometheus Ready<br/>🎯 Performance Monitoring]
-    end
-
-    %% Flow Connections - User Interactions
-    U --> BROWSER
-    U --> POSTMAN
-    U --> CLI_USER
+    %% === MAIN FLOW CONNECTIONS ===
+    USER -->|HTTP Requests| NGINX
+    DEV -->|API Testing| ORDER_API
+    DEV -->|Direct API| PRODUCT_API
+    DEV -->|Direct API| CUSTOMER_API
     
-    BROWSER --> NGINX
-    POSTMAN --> ORDER_API
-    POSTMAN --> PRODUCT_API
-    POSTMAN --> CUSTOMER_API
-    CLI_USER --> ORDER_API
-
-    %% Frontend Internal Flow
-    NGINX --> HTML
-    NGINX --> CSS
-    NGINX --> JS
-    NGINX -.->|"Proxy /api/*"| ORDER_API
-
-    %% Main Processing Flow
-    JS -->|"POST /api/orders<br/>Unique OrderID"| ORDER_API
-    ORDER_API -->|"Kafka Message<br/>JSON Payload"| T_ORDERS
+    NGINX --> WEB
+    WEB -->|POST /orders| ORDER_API
+    ORDER_API -->|Publish Event| KAFKA
+    KAFKA --> TOPICS
+    TOPICS -->|Consume| WORKER
     
-    %% Kafka Infrastructure
-    ZK -->|"Coordination"| KAFKA
-    KAFKA --> T_ORDERS
-    KAFKA --> T_RETRY
-    KAFKA --> T_DLQ
-
-    %% Order Processing Flow
-    T_ORDERS -->|"Message Consumption"| CONSUMER
-    CONSUMER --> ORDER_WORKER
-    ORDER_WORKER --> LOCK
-    LOCK <-->|"Acquire/Release Lock"| R_LOCKS
+    WORKER -->|Enrich Data| PRODUCT_API
+    WORKER -->|Validate Customer| CUSTOMER_API
+    WORKER -->|Store Orders| MONGO
+    WORKER -->|Distributed Locks| REDIS
     
-    ORDER_WORKER --> ENRICHMENT
-    ENRICHMENT -->|"GET /products/{id}"| PRODUCT_API
-    ENRICHMENT -->|"GET /customers/{id}"| CUSTOMER_API
-    
-    ORDER_WORKER --> VALIDATION
-    VALIDATION -->|"✅ Success Path"| DB_ORDERS
-    VALIDATION -.->|"❌ Failure Path"| RETRY
-    
-    RETRY <-->|"Store Retry Data"| R_RETRY
-    RETRY -.->|"Max Retries Exceeded"| T_DLQ
+    PRODUCT_API -->|Read Catalog| MONGO
+    CUSTOMER_API -->|Read Customers| MONGO
 
-    %% API Internal Architecture
-    PRODUCT_API --> P_HANDLERS
-    P_HANDLERS --> P_SERVICES
-    P_SERVICES --> P_REPO
-    P_REPO --> DB_CATALOG
-    P_MODELS -.-> P_HANDLERS
-    P_MIDDLEWARE -.-> P_HANDLERS
-    
-    CUSTOMER_API --> C_HANDLERS
-    C_HANDLERS --> C_SERVICES
-    C_SERVICES --> C_REPO
-    C_REPO --> DB_CATALOG
-    C_MODELS -.-> C_HANDLERS
-    C_MIDDLEWARE -.-> C_HANDLERS
-
-    %% Data Initialization Flow
-    MONGO_INIT --> DB_CATALOG
-    INIT_PRODUCTS --> DB_CATALOG
-    INIT_CUSTOMERS --> DB_CATALOG
-
-    %% Observability Integration
-    ORDER_WORKER --> LOGGING
-    PRODUCT_API --> HEALTH
-    CUSTOMER_API --> HEALTH
-    ORDER_API --> HEALTH
-    NGINX --> HEALTH
-    
-    PRODUCT_API --> METRICS
-    CUSTOMER_API --> METRICS
-    ORDER_API --> METRICS
-
-    %% Styling
-    classDef userInterface fill:#e1f5fe,stroke:#01579b,stroke-width:3px
-    classDef frontend fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef gateway fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef messageLayer fill:#ffebee,stroke:#c62828,stroke-width:2px
+    %% === STYLING ===
+    classDef userLayer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef frontendLayer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef gatewayLayer fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef brokerLayer fill:#ffebee,stroke:#c62828,stroke-width:2px
     classDef processingLayer fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef apiLayer fill:#e0f2f1,stroke:#00695c,stroke-width:2px
     classDef storageLayer fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef initLayer fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
-    classDef observabilityLayer fill:#fafafa,stroke:#424242,stroke-width:2px
 
-    class U,BROWSER,POSTMAN,CLI_USER userInterface
-    class NGINX,HTML,CSS,JS frontend
-    class ORDER_API gateway
-    class ZK,KAFKA,T_ORDERS,T_RETRY,T_DLQ messageLayer
-    class ORDER_WORKER,CONSUMER,ENRICHMENT,VALIDATION,RETRY,LOCK processingLayer
-    class PRODUCT_API,P_HANDLERS,P_SERVICES,P_REPO,P_MODELS,P_MIDDLEWARE,CUSTOMER_API,C_HANDLERS,C_SERVICES,C_REPO,C_MODELS,C_MIDDLEWARE apiLayer
-    class MONGODB,DB_CATALOG,DB_ORDERS,REDIS,R_LOCKS,R_RETRY,R_CACHE storageLayer
-    class MONGO_INIT,INIT_PRODUCTS,INIT_CUSTOMERS initLayer
-    class LOGGING,HEALTH,METRICS observabilityLayer
+    class USER,DEV userLayer
+    class NGINX,WEB frontendLayer
+    class ORDER_API gatewayLayer
+    class KAFKA,TOPICS brokerLayer
+    class WORKER processingLayer
+    class PRODUCT_API,CUSTOMER_API apiLayer
+    class MONGO,REDIS storageLayer
 ```
 
 ---
@@ -339,8 +206,8 @@ sequenceDiagram
     W->>W: 24. Deserialize OrderMessage<br/>📦 JSON → Java Records
     
     %% 7. Distributed Locking
-    W->>L: 25. Request distributed lock<br/>🔒 order:lock:{orderId}
-    L->>R: 26. SET NX EX order:lock:{orderId} 60<br/>⏰ TTL 60 segundos
+    W->>L: 25. Request distributed lock<br/>🔒 order_lock_orderId
+    L->>R: 26. SET NX EX order_lock_orderId 60<br/>⏰ TTL 60 segundos
     R-->>L: 27. ✅ Lock acquired
     L-->>W: 28. ✅ Lock confirmed
     
@@ -367,8 +234,8 @@ sequenceDiagram
     M-->>W: 42. ✅ Order persisted<br/>🆔 ObjectId returned
     
     %% 11. Cleanup & Completion
-    W->>L: 43. Release distributed lock<br/>🔓 DEL order:lock:{orderId}
-    L->>R: 44. DEL order:lock:{orderId}<br/>🗑️ Clean up lock
+    W->>L: 43. Release distributed lock<br/>🔓 DEL order_lock_orderId
+    L->>R: 44. DEL order_lock_orderId<br/>🗑️ Clean up lock
     R-->>L: 45. ✅ Lock released
     W->>W: 46. Log completion<br/>📝 "✅ Order processed successfully"
     
@@ -449,7 +316,7 @@ graph TB
         end
         
         subgraph "🔧 Frontend Features"
-            AUTO_ID[🆔 Auto Order ID Generation<br/>📋 Unique timestamp-based IDs<br/>📊 ORD-{timestamp}-{random}<br/>🎯 Duplicate prevention]
+            AUTO_ID[🆔 Auto Order ID Generation<br/>📋 Unique timestamp-based IDs<br/>📊 ORD-timestamp-random<br/>🎯 Duplicate prevention]
             
             REAL_TIME[⏱️ Real-time Status Updates<br/>📋 Immediate UI feedback<br/>📊 Color-coded states<br/>🎯 User experience]
             
@@ -487,7 +354,7 @@ graph TB
             
             KAFKA_FEATURES[🔧 Kafka Features<br/>📋 Topic-based messaging<br/>📊 Partition management<br/>🎯 Scalable messaging]
             
-            KAFKA_TOPICS[📋 Topic Configuration<br/>📊 orders (main processing)<br/>📊 orders-retry (failed messages)<br/>📊 orders-dlq (dead letters)]
+            KAFKA_TOPICS[📋 Topic Configuration<br/>📊 orders - main processing<br/>📊 orders_retry - failed messages<br/>📊 orders_dlq - dead letters]
         end
     end
 
@@ -531,15 +398,15 @@ graph TB
         end
         
         subgraph "🏗️ Clean Architecture Implementation"
-            GO_HANDLERS[📡 Handlers (Controllers)<br/>📋 HTTP request handling<br/>📊 JSON serialization<br/>🎯 API endpoints]
+            GO_HANDLERS[📡 Handlers - Controllers<br/>📋 HTTP request handling<br/>📊 JSON serialization<br/>🎯 API endpoints]
             
-            GO_SERVICES[💼 Services (Business Logic)<br/>📋 Domain operations<br/>📊 Validation rules<br/>🎯 Core functionality]
+            GO_SERVICES[💼 Services - Business Logic<br/>📋 Domain operations<br/>📊 Validation rules<br/>🎯 Core functionality]
             
-            GO_REPOSITORIES[💾 Repositories (Data Access)<br/>📋 MongoDB operations<br/>📊 CRUD operations<br/>🎯 Persistence layer]
+            GO_REPOSITORIES[💾 Repositories - Data Access<br/>📋 MongoDB operations<br/>📊 CRUD operations<br/>🎯 Persistence layer]
             
-            GO_MODELS[📋 Models (Domain Objects)<br/>📋 Struct definitions<br/>📊 JSON tags<br/>🎯 Data representation]
+            GO_MODELS[📋 Models - Domain Objects<br/>📋 Struct definitions<br/>📊 JSON tags<br/>🎯 Data representation]
             
-            GO_MIDDLEWARE[🛡️ Middleware<br/>📋 Cross-cutting concerns<br/>📊 Logging, CORS, Recovery<br/>🎯 Request pipeline]
+            GO_MIDDLEWARE[🛡️ Middleware - Cross-cutting<br/>📋 Cross-cutting concerns<br/>📊 Logging, CORS, Recovery<br/>🎯 Request pipeline]
         end
     end
 
@@ -621,7 +488,8 @@ graph TB
     classDef processing fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef apis fill:#e0f2f1,stroke:#00695c,stroke-width:2px
     classDef storage fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef observability fill:#fafafa,stroke:#424242,stroke-width:2px
+    classDef initLayer fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
+    classDef observabilityLayer fill:#fafafa,stroke:#424242,stroke-width:2px
 
     class BACKEND_PROFILE,FRONTEND_PROFILE,COMPOSE,VOLUMES,NETWORKS,HEALTH_CHECKS,DEPENDENCY_MGMT infrastructure
     class NGINX_TECH,NGINX_CONFIG,HTML5,CSS3,ES6,AUTO_ID,REAL_TIME,API_INTEGRATION frontend
@@ -630,7 +498,8 @@ graph TB
     class JAVA21,SPRING_BOOT,WEBFLUX,MAVEN,KAFKA_LISTENER,WEBCLIENT,REACTIVE_MONGO,CONTROLLERS,SERVICES,REPOSITORIES,MODELS processing
     class GO_TECH,ECHO_FRAMEWORK,MONGO_DRIVER,GO_HANDLERS,GO_SERVICES,GO_REPOSITORIES,GO_MODELS,GO_MIDDLEWARE apis
     class MONGO_TECH,MONGO_FEATURES,MONGO_INIT,REDIS_TECH,REDIS_FEATURES,REDIS_USE_CASES storage
-    class STRUCTURED_LOGGING,LOG_AGGREGATION,HEALTH_ENDPOINTS,METRICS_ENDPOINTS,TESTCONTAINERS,POSTMAN_COLLECTION observability
+    class MONGO_INIT,INIT_PRODUCTS,INIT_CUSTOMERS initLayer
+    class STRUCTURED_LOGGING,LOG_AGGREGATION,HEALTH_ENDPOINTS,METRICS_ENDPOINTS,TESTCONTAINERS,POSTMAN_COLLECTION observabilityLayer
 ```
 
 ---
@@ -655,11 +524,11 @@ graph TB
 
 ### 🏛️ **Clean Architecture (APIs Go)**
 ```
-📡 Handlers (Presentation) → 💼 Services (Business) → 💾 Repository (Data) → 💾 MongoDB
+📡 Handlers - Controllers → 💼 Services - Business Logic → 💾 Repository - Data Access → 💾 MongoDB
                               ↑
-                         📋 Models (Domain)
+                         📋 Models - Domain Objects
                               ↑  
-                         🛡️ Middleware (Cross-cutting)
+                         🛡️ Middleware - Cross-cutting
 ```
 
 ### ⚡ **Reactive Programming (Order Worker)**
@@ -705,8 +574,8 @@ graph TB
 1. **Error Detection** en cualquier step (API timeout, cliente inactivo, etc.)
 2. **Retry Service** registra intento fallido en Redis con timestamp y razón
 3. **Exponential Backoff** con incremento: 1s, 2s, 4s, 8s, 16s, 32s
-4. **Retry Publishing** a topic `orders-retry` tras delay calculado
-5. **Dead Letter Queue** tras 6 intentos fallidos a topic `orders-dlq`
+4. **Retry Publishing** a topic `orders_retry` tras delay calculado
+5. **Dead Letter Queue** tras 6 intentos fallidos a topic `orders_dlq`
 6. **Structured Logging** permite tracking completo con emoji markers
 
 ---
