@@ -194,80 +194,8 @@ func (r *MemoryCustomerRepository) matchesFilters(customer *models.Customer, fil
 	return true
 }
 
-// initializeSampleData populates the repository with sample customers
+// initializeSampleData is deprecated - data now comes from MongoDB initialization scripts
 func (r *MemoryCustomerRepository) initializeSampleData() {
-	now := time.Now()
-	
-	sampleCustomers := []*models.Customer{
-		{
-			CustomerID:   "customer-1",
-			Name:         "Juan Pérez García",
-			Email:        "juan.perez@email.com",
-			Phone:        "+34 600 123 456",
-			Address:      "Calle Mayor 123, 28001 Madrid",
-			Active:       true,
-			CustomerTier: "standard",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-		{
-			CustomerID:   "customer-2",
-			Name:         "María González López",
-			Email:        "maria.gonzalez@email.com",
-			Phone:        "+34 600 234 567",
-			Address:      "Avenida de la Constitución 45, 41001 Sevilla",
-			Active:       true,
-			CustomerTier: "premium",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-		{
-			CustomerID:   "customer-3",
-			Name:         "Carlos Rodríguez Silva",
-			Email:        "carlos.rodriguez@email.com",
-			Phone:        "+34 600 345 678",
-			Address:      "Plaza de España 12, 08001 Barcelona",
-			Active:       false, // Inactive customer for testing
-			CustomerTier: "standard",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-		{
-			CustomerID:   "customer-inactive",
-			Name:         "Cliente Inactivo",
-			Email:        "inactivo@email.com",
-			Phone:        "+34 600 456 789",
-			Address:      "Calle Inactiva 1, 46001 Valencia",
-			Active:       false,
-			CustomerTier: "basic",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-		{
-			CustomerID:   "customer-premium",
-			Name:         "Ana Premium VIP",
-			Email:        "ana.premium@email.com",
-			Phone:        "+34 600 567 890",
-			Address:      "Paseo de la Castellana 100, 28046 Madrid",
-			Active:       true,
-			CustomerTier: "premium",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-		{
-			CustomerID:   "customer-error",
-			Name:         "Cliente que causa error",
-			Email:        "error@email.com",
-			Phone:        "+34 600 678 901",
-			Address:      "Calle Error 500, 00000 Testing",
-			Active:       true,
-			CustomerTier: "standard",
-			CreatedAt:    now,
-			UpdatedAt:    now,
-		},
-	}
-	
-	for _, customer := range sampleCustomers {
-		r.customers[customer.CustomerID] = customer
-	}
+	// No longer needed - MongoDB provides the data via init scripts
+	// This is kept for backward compatibility but does nothing
 }

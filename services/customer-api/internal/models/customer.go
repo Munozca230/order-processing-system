@@ -4,17 +4,35 @@ import (
 	"time"
 )
 
+// Address represents a customer address
+type Address struct {
+	Street     string `json:"street,omitempty" bson:"street,omitempty"`
+	City       string `json:"city,omitempty" bson:"city,omitempty"`
+	PostalCode string `json:"postalCode,omitempty" bson:"postalCode,omitempty"`
+	Country    string `json:"country,omitempty" bson:"country,omitempty"`
+}
+
+// Preferences represents customer preferences
+type Preferences struct {
+	Newsletter    bool `json:"newsletter" bson:"newsletter"`
+	Notifications bool `json:"notifications" bson:"notifications"`
+}
+
 // Customer represents a customer in the system
 type Customer struct {
-	CustomerID   string    `json:"customerId" validate:"required"`
-	Name         string    `json:"name" validate:"required,min=1,max=255"`
-	Email        string    `json:"email,omitempty"`
-	Phone        string    `json:"phone,omitempty"`
-	Address      string    `json:"address,omitempty"`
-	Active       bool      `json:"active"`
-	CustomerTier string    `json:"customerTier,omitempty"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	CustomerID       string       `json:"customerId" bson:"customerId" validate:"required"`
+	Name             string       `json:"name" bson:"name" validate:"required,min=1,max=255"`
+	Email            string       `json:"email,omitempty" bson:"email,omitempty"`
+	Phone            string       `json:"phone,omitempty" bson:"phone,omitempty"`
+	Address          Address      `json:"address,omitempty" bson:"address,omitempty"`
+	Active           bool         `json:"active" bson:"active"`
+	CustomerTier     string       `json:"customerTier,omitempty" bson:"customerTier,omitempty"`
+	Preferences      Preferences  `json:"preferences,omitempty" bson:"preferences,omitempty"`
+	RegistrationDate *time.Time   `json:"registrationDate,omitempty" bson:"registrationDate,omitempty"`
+	LastLogin        *time.Time   `json:"lastLogin,omitempty" bson:"lastLogin,omitempty"`
+	LoyaltyPoints    int          `json:"loyaltyPoints,omitempty" bson:"loyaltyPoints,omitempty"`
+	CreatedAt        time.Time    `json:"createdAt" bson:"createdAt"`
+	UpdatedAt        time.Time    `json:"updatedAt" bson:"updatedAt"`
 }
 
 // CustomerSummary represents a simplified customer view
