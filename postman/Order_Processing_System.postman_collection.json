@@ -108,6 +108,36 @@
           "response": []
         },
         {
+          "name": "Get New Product - SSD NVMe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{productApiPort}}/products/product-6",
+              "host": ["{{baseUrl}}"],
+              "port": "{{productApiPort}}",
+              "path": ["products", "product-6"]
+            },
+            "description": "Obtener SSD NVMe 1TB Samsung del catálogo expandido"
+          },
+          "response": []
+        },
+        {
+          "name": "Get New Product - RTX 4060",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{productApiPort}}/products/product-8",
+              "host": ["{{baseUrl}}"],
+              "port": "{{productApiPort}}",
+              "path": ["products", "product-8"]
+            },
+            "description": "Obtener Tarjeta Gráfica RTX 4060 del catálogo expandido"
+          },
+          "response": []
+        },
+        {
           "name": "Get Non-existent Product",
           "request": {
             "method": "GET",
@@ -149,10 +179,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/customer-1",
+              "raw": "{{baseUrl}}:{{customerApiPort}}/customers/customer-premium",
               "host": ["{{baseUrl}}"],
               "port": "{{customerApiPort}}",
-              "path": ["customers", "customer-1"]
+              "path": ["customers", "customer-premium"]
             },
             "description": "Obtener cliente específico por ID"
           },

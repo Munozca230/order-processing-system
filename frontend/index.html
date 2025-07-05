@@ -737,15 +737,31 @@
             }
         }
 
-        // Cargar orden de ejemplo
+        // Cargar orden de ejemplo con datos dinámicos
         function loadSampleOrder() {
             generateNewOrderId(); // Generar ID único
-            document.getElementById('customerId').value = 'customer-1';
             
-            // Seleccionar algunos productos
+            // Seleccionar cliente premium para mostrar funcionalidad completa
+            document.getElementById('customerId').value = 'customer-premium';
+            
+            // Seleccionar productos variados del catálogo expandido
             const productsSelect = document.getElementById('products');
-            productsSelect.options[0].selected = true; // Laptop
-            productsSelect.options[1].selected = true; // Mouse
+            
+            // Esperar a que los productos se hayan cargado dinámicamente
+            setTimeout(() => {
+                const products = productsSelect.options;
+                
+                // Seleccionar productos diversos del catálogo expandido
+                for (let option of products) {
+                    if (option.value === 'product-1' ||     // Laptop Gaming MSI
+                        option.value === 'product-6' ||     // SSD NVMe 1TB
+                        option.value === 'product-8') {     // Tarjeta Gráfica RTX 4060
+                        option.selected = true;
+                    }
+                }
+                
+                console.log('📋 Orden de ejemplo cargada: Cliente Premium + 3 productos del catálogo expandido');
+            }, 500); // Pequeña espera para asegurar que los productos estén cargados
         }
 
         // Limpiar resultados

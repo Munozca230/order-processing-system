@@ -172,7 +172,7 @@ sequenceDiagram
     F->>U: 3. Mostrar formulario con OrderID único<br/>Format: ORD-{timestamp}-{random}
     
     %% 2. Order Creation
-    U->>F: 4. Seleccionar cliente y productos<br/>✅ customer-1 (activo) + product-1
+    U->>F: 4. Seleccionar cliente y productos<br/>✅ customer-premium (activo) + product-8 (RTX 4060)
     F->>F: 5. Validar formulario<br/>🔍 Cliente seleccionado, productos válidos
     F->>O: 6. POST /api/orders<br/>📦 {orderId, customerId, products[]}
     
@@ -245,11 +245,11 @@ sequenceDiagram
     Note over U,V: ❌ Flujo Alternativo: Cliente Inactivo
 
     rect rgb(255, 245, 245)
-        K->>W: A1. Consume message (customer-3 inactive)
+        K->>W: A1. Consume message (customer-inactive)
         W->>L: A2. Acquire lock ✅
-        W->>C: A3. GET /customers/customer-3
-        C->>M: A4. Query customer-3
-        M-->>C: A5. {customerId: "customer-3", active: false}
+        W->>C: A3. GET /customers/customer-inactive
+        C->>M: A4. Query customer-inactive
+        M-->>C: A5. {customerId: "customer-inactive", active: false}
         C-->>W: A6. Customer data (inactive)
         W->>V: A7. Validate business rules
         V->>V: A8. Check customer.active === false ❌

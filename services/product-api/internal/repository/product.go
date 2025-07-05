@@ -199,80 +199,10 @@ func (r *MemoryProductRepository) matchesFilters(product *models.Product, filter
 	return true
 }
 
-// initializeSampleData populates the repository with sample products
+// initializeSampleData is deprecated - data now comes from MongoDB initialization scripts
 func (r *MemoryProductRepository) initializeSampleData() {
-	now := time.Now()
-	
-	sampleProducts := []*models.Product{
-		{
-			ProductID:   "product-1",
-			Name:        "Laptop Gaming MSI",
-			Description: "High-performance gaming laptop with RTX graphics",
-			Price:       1299.99,
-			Category:    "laptops",
-			Stock:       15,
-			Active:      true,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-		{
-			ProductID:   "product-2",
-			Name:        "Mouse Gamer Logitech",
-			Description: "Wireless gaming mouse with RGB lighting",
-			Price:       59.99,
-			Category:    "peripherals",
-			Stock:       50,
-			Active:      true,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-		{
-			ProductID:   "product-3",
-			Name:        "Teclado Mecánico RGB",
-			Description: "Mechanical keyboard with customizable RGB lighting",
-			Price:       129.99,
-			Category:    "peripherals",
-			Stock:       30,
-			Active:      true,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-		{
-			ProductID:   "product-4",
-			Name:        "Monitor 4K 27 pulgadas",
-			Description: "Ultra HD 4K monitor for gaming and productivity",
-			Price:       399.99,
-			Category:    "monitors",
-			Stock:       20,
-			Active:      true,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-		{
-			ProductID:   "product-5",
-			Name:        "Auriculares Gaming",
-			Description: "Professional gaming headset with noise cancellation",
-			Price:       89.99,
-			Category:    "peripherals",
-			Stock:       40,
-			Active:      true,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-		{
-			ProductID:   "product-error",
-			Name:        "Producto que causa error",
-			Description: "Test product that simulates errors",
-			Price:       999.99,
-			Category:    "testing",
-			Stock:       0,
-			Active:      false,
-			CreatedAt:   now,
-			UpdatedAt:   now,
-		},
-	}
-	
-	for _, product := range sampleProducts {
-		r.products[product.ProductID] = product
-	}
+	// No longer needed - MongoDB provides the expanded catalog (9 products) via init scripts
+	// including: product-1 to product-9 with categories: laptops, peripherals, monitors, 
+	// storage, components, furniture
+	// This is kept for backward compatibility but does nothing
 }

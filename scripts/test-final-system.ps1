@@ -42,28 +42,28 @@ try {
     Write-Host "   ❌ Customer API failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Test data retrieval
-Write-Host "`n   Testing data retrieval:" -ForegroundColor Cyan
+# Test data retrieval with expanded catalog
+Write-Host "`n   Testing expanded catalog retrieval:" -ForegroundColor Cyan
 try {
-    $productResponse = Invoke-WebRequest -Uri "http://localhost:8081/products/product-1" -UseBasicParsing
+    $productResponse = Invoke-WebRequest -Uri "http://localhost:8081/products/product-8" -UseBasicParsing
     $productData = $productResponse.Content | ConvertFrom-Json
-    Write-Host "   ✅ Product fetched: $($productData.name) - $$($productData.price)" -ForegroundColor Green
+    Write-Host "   ✅ New Product: $($productData.name) - $$($productData.price)" -ForegroundColor Green
 } catch {
-    Write-Host "   ❌ Product fetch failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   ❌ New product fetch failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 try {
-    $customerResponse = Invoke-WebRequest -Uri "http://localhost:8082/customers/customer-1" -UseBasicParsing
+    $customerResponse = Invoke-WebRequest -Uri "http://localhost:8082/customers/customer-premium" -UseBasicParsing
     $customerData = $customerResponse.Content | ConvertFrom-Json
-    Write-Host "   ✅ Customer fetched: $($customerData.name) - Active: $($customerData.active)" -ForegroundColor Green
+    Write-Host "   ✅ Premium Customer: $($customerData.name) - Active: $($customerData.active)" -ForegroundColor Green
 } catch {
-    Write-Host "   ❌ Customer fetch failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   ❌ Premium customer fetch failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Test end-to-end processing
-Write-Host "`n6. Testing end-to-end order processing..." -ForegroundColor Yellow
-$testMessage = '{"orderId":"final-e2e-test","customerId":"customer-1","products":[{"productId":"product-1"},{"productId":"product-2"}]}'
-Write-Host "   Sending order: $testMessage" -ForegroundColor Cyan
+# Test end-to-end processing with expanded catalog
+Write-Host "`n6. Testing end-to-end order processing with expanded catalog..." -ForegroundColor Yellow
+$testMessage = '{"orderId":"final-e2e-test","customerId":"customer-premium","products":[{"productId":"product-6"},{"productId":"product-8"},{"productId":"product-9"}]}'
+Write-Host "   Sending premium order: $testMessage" -ForegroundColor Cyan
 echo $testMessage | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders
 
 Start-Sleep -Seconds 10

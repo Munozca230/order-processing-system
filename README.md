@@ -53,13 +53,17 @@ scripts/test-final-system.ps1
 curl http://localhost:8081/health  # Product API
 curl http://localhost:8082/health  # Customer API
 
-# Crear orden (solo si frontend activo)
+# Crear orden con catálogo expandido (solo si frontend activo)
 curl -X POST http://localhost:3000/api/orders \
   -H "Content-Type: application/json" \
-  -d '{"orderId":"test-001","customerId":"customer-1","products":[{"productId":"product-1"}]}'
+  -d '{"orderId":"test-001","customerId":"customer-premium","products":[{"productId":"product-1"},{"productId":"product-8"}]}'
 
-# Crear orden directo a Kafka (backend-only)
-echo '{"orderId":"test-002","customerId":"customer-1","products":[{"productId":"product-1"}]}' | \
+# Crear orden directo a Kafka con nuevos productos (backend-only)
+echo '{"orderId":"test-002","customerId":"customer-5","products":[{"productId":"product-6"},{"productId":"product-9"}]}' | \
+  docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders
+
+# Probar cliente inactivo (va a retry queue)
+echo '{"orderId":"test-003","customerId":"customer-inactive","products":[{"productId":"product-7"}]}' | \
   docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders
 ```
 
