@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Processing System - Demo</title>
+    <title>Order Processing System</title>
     <style>
         * {
             margin: 0;
@@ -13,35 +13,38 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
         }
         
         .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background-color: #2563eb;
             color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 24px 30px;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
         
         .header p {
-            font-size: 1.1em;
+            font-size: 0.95em;
             opacity: 0.9;
+            margin: 0;
         }
         
         .content {
@@ -52,18 +55,19 @@
         }
         
         .section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            border: 1px solid #e9ecef;
+            background: white;
+            border-radius: 6px;
+            padding: 24px;
+            border: 1px solid #e0e0e0;
         }
         
         .section h2 {
-            color: #333;
+            color: #1f2937;
             margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #4facfe;
-            padding-bottom: 10px;
+            font-size: 1.25em;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
         }
         
         .form-group {
@@ -88,24 +92,25 @@
         
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #4facfe;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #2563eb;
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
             width: 100%;
         }
         
         .btn:hover {
-            transform: translateY(-2px);
+            background-color: #1d4ed8;
         }
         
         .btn:disabled {
@@ -119,20 +124,22 @@
         }
         
         .result-item {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #28a745;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid #10b981;
+            border: 1px solid #e5e7eb;
         }
         
         .result-item.error {
-            border-left-color: #dc3545;
+            border-left-color: #ef4444;
+            background: #fef2f2;
         }
         
         .result-item.pending {
-            border-left-color: #ffc107;
+            border-left-color: #f59e0b;
+            background: #fffbeb;
         }
         
         .result-item h4 {
@@ -156,21 +163,23 @@
             margin-right: 8px;
         }
         
-        .status-success { background-color: #28a745; }
-        .status-error { background-color: #dc3545; }
-        .status-pending { background-color: #ffc107; }
+        .status-success { background-color: #10b981; }
+        .status-error { background-color: #ef4444; }
+        .status-pending { background-color: #f59e0b; }
         
         .quick-actions {
             grid-column: span 2;
-            background: #e3f2fd;
-            border-radius: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
             padding: 20px;
             text-align: center;
+            border: 1px solid #e2e8f0;
         }
         
         .quick-actions h3 {
-            margin-bottom: 15px;
-            color: #1976d2;
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-weight: 600;
         }
         
         .action-buttons {
@@ -180,18 +189,19 @@
         }
         
         .action-btn {
-            background: #1976d2;
+            background: #64748b;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         
         .action-btn:hover {
-            background: #1565c0;
+            background: #475569;
         }
         
         @media (max-width: 768px) {
@@ -208,13 +218,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Order Processing System</h1>
+            <h1>Order Processing System</h1>
             <p>Sistema de procesamiento de pedidos con arquitectura de microservicios</p>
         </div>
         
         <div class="content">
             <div class="section">
-                <h2>📝 Crear Nueva Orden</h2>
+                <h2>Crear Nueva Orden</h2>
                 <form id="orderForm">
                     <div class="form-group">
                         <label for="orderId">ID de Orden (Auto-generado):</label>
@@ -237,20 +247,20 @@
                     </div>
                     
                     <button type="submit" class="btn" id="submitBtn">
-                        🚀 Enviar Orden
+                        Enviar Orden
                     </button>
                 </form>
             </div>
             
             <div class="section">
-                <h2>📊 Estado del Sistema</h2>
+                <h2>Estado del Sistema</h2>
                 <div id="systemStatus">
                     <div class="result-item pending">
                         <h4><span class="status-indicator status-pending"></span>Verificando servicios...</h4>
                     </div>
                 </div>
                 
-                <h3 style="margin-top: 25px; margin-bottom: 15px;">🔍 Órdenes Recientes</h3>
+                <h3 style="margin-top: 24px; margin-bottom: 14px; font-size: 1.1em; color: #374151;">Órdenes Recientes</h3>
                 <div id="recentOrders">
                     <p style="color: #666; text-align: center; padding: 20px;">
                         No hay órdenes recientes. Crea una orden para comenzar.
@@ -259,19 +269,19 @@
             </div>
             
             <div class="quick-actions">
-                <h3>⚡ Acciones Rápidas</h3>
+                <h3>Acciones Rápidas</h3>
                 <div class="action-buttons">
                     <button class="action-btn" onclick="checkSystemHealth()">
-                        🏥 Verificar Estado
+                        Verificar Estado
                     </button>
                     <button class="action-btn" onclick="loadSampleOrder()">
-                        📋 Orden de Ejemplo
+                        Orden de Ejemplo
                     </button>
                     <button class="action-btn" onclick="clearResults()">
-                        🗑️ Limpiar Resultados
+                        Limpiar Resultados
                     </button>
                     <button class="action-btn" onclick="showDocs()">
-                        📚 Documentación
+                        Documentación
                     </button>
                 </div>
             </div>
@@ -317,9 +327,9 @@
                     select.appendChild(option);
                 });
                 
-                console.log(`✅ Cargados ${data.customers.length} clientes`);
+                console.log(`Cargados ${data.customers.length} clientes`);
             } catch (error) {
-                console.error('❌ Error cargando clientes:', error);
+                console.error('Error cargando clientes:', error);
                 select.innerHTML = '<option value="">Error cargando clientes</option>';
             }
         }
@@ -343,9 +353,9 @@
                     select.appendChild(option);
                 });
                 
-                console.log(`✅ Cargados ${data.products.length} productos`);
+                console.log(`Cargados ${data.products.length} productos`);
             } catch (error) {
-                console.error('❌ Error cargando productos:', error);
+                console.error('Error cargando productos:', error);
                 select.innerHTML = '<option value="">Error cargando productos</option>';
             }
         }
@@ -393,7 +403,7 @@
                         statusHTML += `
                             <div class="result-item">
                                 <h4><span class="status-indicator status-success"></span>${service.name}</h4>
-                                <p>Servicio funcionando correctamente ✅</p>
+                                <p>Servicio funcionando correctamente</p>
                             </div>
                         `;
                     } else {
@@ -403,7 +413,7 @@
                     statusHTML += `
                         <div class="result-item error">
                             <h4><span class="status-indicator status-error"></span>${service.name}</h4>
-                            <p>Error: ${error.message} ❌</p>
+                            <p>Error: ${error.message}</p>
                             <small>Asegúrate de que los servicios estén ejecutándose con docker-compose</small>
                         </div>
                     `;
@@ -428,7 +438,7 @@
 
             // Deshabilitar botón
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Enviando...';
+            submitBtn.textContent = 'Enviando...';
 
             const orderMessage = {
                 orderId: orderId,
@@ -455,13 +465,13 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('✅ Orden enviada exitosamente:', result);
+                    console.log('Orden enviada exitosamente:', result);
                     
                     // Actualizar estado de la orden como enviada
-                    updateOrderStatus(orderId, 'pending', '⏳ Enriqueciendo con datos de productos...');
+                    updateOrderStatus(orderId, 'pending', 'Enriqueciendo con datos de productos...');
                     
                     // Mostrar mensaje de éxito
-                    alert(`✅ Orden enviada exitosamente a Kafka!\n\n📋 ID: ${orderId}\n⏰ Timestamp: ${result.timestamp}\n\n📊 Obteniendo datos completos de productos...`);
+                    alert(`Orden enviada exitosamente a Kafka\n\nID: ${orderId}\nTimestamp: ${result.timestamp}\n\nObteniendo datos completos de productos...`);
                     
                     // Consultar inmediatamente los datos procesados
                     checkProcessedOrder(orderId);
@@ -479,19 +489,19 @@
                 document.getElementById('products').selectedIndex = -1;
 
             } catch (error) {
-                console.error('❌ Error enviando orden:', error);
+                console.error('Error enviando orden:', error);
                 
                 // Si la API no está disponible, mostrar las instrucciones manuales
                 if (error.message.includes('fetch')) {
-                    alert(`⚠️ Order API no disponible. Para enviar manualmente:\n\n🔧 Comando Docker:\necho '${JSON.stringify(orderMessage)}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n\n💡 O inicia la Order API: docker-compose up -d order-api`);
-                    updateOrderStatus(orderId, 'error', '❌ API no disponible - usar comando manual');
+                    alert(`Order API no disponible. Para enviar manualmente:\n\nComando Docker:\necho '${JSON.stringify(orderMessage)}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n\nO inicia la Order API: docker-compose up -d order-api`);
+                    updateOrderStatus(orderId, 'error', 'API no disponible - usar comando manual');
                 } else {
-                    alert('❌ Error enviando orden: ' + error.message);
-                    updateOrderStatus(orderId, 'error', '❌ ' + error.message);
+                    alert('Error enviando orden: ' + error.message);
+                    updateOrderStatus(orderId, 'error', error.message);
                 }
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Enviar Orden';
+                submitBtn.textContent = 'Enviar Orden';
             }
         }
 
@@ -515,7 +525,7 @@
                     <p><strong>Productos:</strong> ${order.products.length} items</p>
                     ${errorMsg ? `<p><strong>Error:</strong> ${errorMsg}</p>` : ''}
                     <pre>${JSON.stringify(order, null, 2)}</pre>
-                    <small>💡 Para el flujo completo, usa: <code>docker-compose logs order-worker</code></small>
+                    <small>Para el flujo completo, usa: <code>docker-compose logs order-worker</code></small>
                 </div>
             `;
 
@@ -563,7 +573,7 @@
                 
                 // Agregar nota explicativa
                 const noteElement = document.createElement('p');
-                noteElement.innerHTML = '<small>💡 <strong>Nota:</strong> Esta es una orden de demostración. Para procesamiento real, usa el comando mostrado arriba.</small>';
+                noteElement.innerHTML = '<small><strong>Nota:</strong> Esta es una orden de demostración. Para procesamiento real, usa el comando mostrado arriba.</small>';
                 orderElement.appendChild(noteElement);
             }
         }
@@ -571,7 +581,7 @@
         // Consultar orden procesada desde MongoDB (vía APIs)
         async function checkProcessedOrder(orderId) {
             try {
-                console.log(`🔍 Consultando orden procesada: ${orderId}`);
+                console.log(`Consultando orden procesada: ${orderId}`);
                 
                 // Simular consulta a APIs para obtener datos enriquecidos
                 // En un entorno real, esto consultaría MongoDB a través de una API
@@ -584,26 +594,26 @@
                     if (processedOrder.success) {
                         // Actualizar la UI con datos completos
                         updateOrderWithProcessedData(orderId, processedOrder.data);
-                        updateOrderStatus(orderId, 'completed', '✅ Completada con datos enriquecidos');
+                        updateOrderStatus(orderId, 'completed', 'Completada con datos enriquecidos');
                     } else {
                         // Mostrar error específico según el tipo
-                        let errorMessage = '❌ ';
+                        let errorMessage = '';
                         switch(processedOrder.reason) {
                             case 'CUSTOMER_INACTIVE':
-                                errorMessage += `Cliente inactivo - NO se guardará en MongoDB`;
+                                errorMessage = 'Cliente inactivo - NO se guardará en MongoDB';
                                 break;
                             case 'CUSTOMER_NOT_FOUND':
-                                errorMessage += `Cliente no encontrado`;
+                                errorMessage = 'Cliente no encontrado';
                                 break;
                             case 'PRODUCT_NOT_FOUND':
-                                errorMessage += `Producto no encontrado`;
+                                errorMessage = 'Producto no encontrado';
                                 break;
                             case 'CUSTOMER_API_ERROR':
                             case 'PRODUCT_API_ERROR':
-                                errorMessage += `Error de API - reintentando`;
+                                errorMessage = 'Error de API - reintentando';
                                 break;
                             default:
-                                errorMessage += `Error en procesamiento`;
+                                errorMessage = 'Error en procesamiento';
                         }
                         
                         updateOrderStatus(orderId, 'error', errorMessage);
@@ -625,7 +635,7 @@
                 }
             } catch (error) {
                 console.error('Error consultando orden procesada:', error);
-                updateOrderStatus(orderId, 'error', '❌ Error consultando estado');
+                updateOrderStatus(orderId, 'error', 'Error consultando estado');
             }
         }
 
@@ -760,7 +770,7 @@
                     }
                 }
                 
-                console.log('📋 Orden de ejemplo cargada: Cliente Premium + 3 productos del catálogo expandido');
+                console.log('Orden de ejemplo cargada: Cliente Premium + 3 productos del catálogo expandido');
             }, 500); // Pequeña espera para asegurar que los productos estén cargados
         }
 
@@ -776,28 +786,7 @@
 
         // Mostrar documentación
         function showDocs() {
-            alert(`📚 Documentación del Sistema
-
-🚀 Para usar el sistema completo:
-
-1. Ejecutar: docker-compose up -d
-2. Verificar que todos los servicios estén healthy
-3. Usar este frontend para pruebas rápidas
-4. Para testing completo, usar Postman Collection
-
-📊 Endpoints disponibles:
-• Product API: http://localhost:8081
-• Customer API: http://localhost:8082
-• Order API: http://localhost:3000
-• MongoDB: localhost:27017
-• Redis: localhost:6379
-
-🔍 Scripts de testing:
-• test-final-system.ps1 - Test completo
-• test-mongodb-apis.ps1 - Test APIs
-• test-package-change.ps1 - Test estructura
-
-📖 Ver README.md para documentación completa`);
+            alert(`Documentación del Sistema\n\nPara usar el sistema completo:\n\n1. Ejecutar: docker-compose up -d\n2. Verificar que todos los servicios estén healthy\n3. Usar este frontend para pruebas rápidas\n4. Para testing completo, usar Postman Collection\n\nEndpoints disponibles:\n• Product API: http://localhost:8081\n• Customer API: http://localhost:8082\n• Order API: http://localhost:3000\n• MongoDB: localhost:27017\n• Redis: localhost:6379\n\nScripts de testing:\n• test-final-system.ps1 - Test completo\n• test-mongodb-apis.ps1 - Test APIs\n• test-package-change.ps1 - Test estructura\n\nVer README.md para documentación completa`);
         }
 
         // Función para enviar orden real via Kafka (requeriría backend)
