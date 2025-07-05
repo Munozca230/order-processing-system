@@ -138,6 +138,48 @@ const customers = [
     testAccount: true, // Flag for error simulation
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+  {
+    customerId: 'customer-4',
+    name: 'David Martín Torres',
+    email: 'david.martin@email.com',
+    phone: '+34 600 678 901',
+    active: true,
+    registrationDate: new Date('2023-03-10'),
+    lastLogin: new Date(),
+    preferences: {
+      newsletter: true,
+      notifications: true
+    },
+    address: {
+      street: 'Gran Vía 200',
+      city: 'Bilbao',
+      postalCode: '48001',
+      country: 'España'
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    customerId: 'customer-5',
+    name: 'Laura Fernández Ruiz',
+    email: 'laura.fernandez@email.com',
+    phone: '+34 600 789 012',
+    active: true,
+    registrationDate: new Date('2023-04-25'),
+    lastLogin: new Date(),
+    preferences: {
+      newsletter: false,
+      notifications: true
+    },
+    address: {
+      street: 'Rambla Catalunya 300',
+      city: 'Barcelona',
+      postalCode: '08008',
+      country: 'España'
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 

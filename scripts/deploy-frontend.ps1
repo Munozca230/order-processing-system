@@ -22,6 +22,27 @@ if ($PreserveData) {
     Write-Host "MODE: Clean deployment (volumes will be reset)" -ForegroundColor Green
 }
 
+# Check if Docker is running
+Write-Host "Checking Docker status..." -ForegroundColor Yellow
+try {
+    $dockerVersion = docker version --format json 2>$null | ConvertFrom-Json
+    if (-not $dockerVersion.Server) {
+        throw "Docker daemon not responding"
+    }
+    Write-Host "✅ Docker is running (Client: $($dockerVersion.Client.Version), Server: $($dockerVersion.Server.Version))" -ForegroundColor Green
+} catch {
+    Write-Host "❌ ERROR: Docker is not running or not accessible" -ForegroundColor Red
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "Please ensure Docker Desktop is running:" -ForegroundColor Yellow
+    Write-Host "  1. Start Docker Desktop application" -ForegroundColor Gray
+    Write-Host "  2. Wait for the green 'Engine running' status" -ForegroundColor Gray
+    Write-Host "  3. Verify with: docker --version" -ForegroundColor Gray
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "If Docker Desktop is not installed:" -ForegroundColor Yellow
+    Write-Host "  Download from: https://www.docker.com/products/docker-desktop" -ForegroundColor Gray
+    exit 1
+}
+
 # Navigate to infra directory
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectRoot = Split-Path -Parent $scriptDir

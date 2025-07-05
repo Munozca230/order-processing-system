@@ -171,8 +171,9 @@ func setupRoutes(e *echo.Echo, productHandler *handlers.ProductHandler) {
 	e.GET("/products/:id", productHandler.GetProduct)
 	e.POST("/products", productHandler.CreateProduct)
 	
-	// Health and monitoring routes
+	// Health and monitoring routes (support both GET and HEAD for Docker health checks)
 	e.GET("/health", productHandler.GetHealth)
+	e.HEAD("/health", productHandler.GetHealth)
 	e.GET("/metrics", productHandler.GetMetrics)
 	
 	// Root endpoint
