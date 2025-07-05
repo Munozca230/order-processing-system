@@ -1,0 +1,17 @@
+{
+  "name": "order-api",
+  "version": "1.0.0",
+  "description": "Simple Node.js API to submit orders to Kafka",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "author": "",
+  "license": "MIT"
+}

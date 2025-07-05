@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Processing System - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .result-item.error {
+            border-left-color: #dc3545;
+        }
+        
+        .result-item.pending {
+            border-left-color: #ffc107;
+        }
+        
+        .result-item h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .result-item pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-success { background-color: #28a745; }
+        .status-error { background-color: #dc3545; }
+        .status-pending { background-color: #ffc107; }
+        
+        .quick-actions {
+            grid-column: span 2;
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .quick-actions h3 {
+            margin-bottom: 15px;
+            color: #1976d2;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #1565c0;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Order Processing System</h1>
+            <p>Sistema de procesamiento de pedidos con arquitectura de microservicios</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📝 Crear Nueva Orden</h2>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="orderId">ID de Orden (Auto-generado):</label>
+                        <input type="text" id="orderId" required readonly style="background-color: #f8f9fa; cursor: not-allowed;" placeholder="Se genera automáticamente">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerId">Cliente:</label>
+                        <select id="customerId" required>
+                            <option value="">Selecciona un cliente</option>
+                            <option value="customer-1">Juan Pérez García (Activo)</option>
+                            <option value="customer-2">María González López (Activa)</option>
+                            <option value="customer-3">Carlos Rodríguez Silva (Inactivo)</option>
+                            <option value="customer-4">Ana Martínez Ruiz (Activa)</option>
+                            <option value="customer-5">Luis García Herrera (Activo)</option>
+                            <option value="customer-6">Carmen López Díez (Inactiva)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="products">Productos:</label>
+                        <select id="products" multiple required style="height: 120px;">
+                            <option value="product-1">Laptop Gaming MSI - $1299.99</option>
+                            <option value="product-2">Mouse Gamer Logitech - $59.99</option>
+                            <option value="product-3">Teclado Mecánico RGB - $129.99</option>
+                            <option value="product-4">Monitor 4K Samsung - $399.99</option>
+                            <option value="product-5">Audífonos Sony WH-1000XM4 - $299.99</option>
+                            <option value="product-6">SSD NVMe 1TB - $149.99</option>
+                        </select>
+                        <small>Mantén Ctrl/Cmd para seleccionar múltiples productos</small>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        🚀 Enviar Orden
+                    </button>
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2>📊 Estado del Sistema</h2>
+                <div id="systemStatus">
+                    <div class="result-item pending">
+                        <h4><span class="status-indicator status-pending"></span>Verificando servicios...</h4>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 25px; margin-bottom: 15px;">🔍 Órdenes Recientes</h3>
+                <div id="recentOrders">
+                    <p style="color: #666; text-align: center; padding: 20px;">
+                        No hay órdenes recientes. Crea una orden para comenzar.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <h3>⚡ Acciones Rápidas</h3>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="checkSystemHealth()">
+                        🏥 Verificar Estado
+                    </button>
+                    <button class="action-btn" onclick="loadSampleOrder()">
+                        📋 Orden de Ejemplo
+                    </button>
+                    <button class="action-btn" onclick="clearResults()">
+                        🗑️ Limpiar Resultados
+                    </button>
+                    <button class="action-btn" onclick="showDocs()">
+                        📚 Documentación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        let orderCounter = 1;
+        let orders = [];
+        let usedOrderIds = new Set(); // Para evitar IDs duplicados
+
+        // Generar ID de orden único
+        function generateNewOrderId() {
+            let newId;
+            do {
+                const timestamp = Date.now();
+                const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                newId = `ORD-${timestamp}-${random}`;
+            } while (usedOrderIds.has(newId)); // Asegurar que sea único
+            
+            usedOrderIds.add(newId);
+            document.getElementById('orderId').value = newId;
+            return newId;
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemHealth();
+            loadOrderCounter();
+            
+            // Auto-generar ID de orden único
+            generateNewOrderId();
+        });
+
+        // Manejar envío de formulario
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await submitOrder();
+        });
+
+        // Verificar estado del sistema
+        async function checkSystemHealth() {
+            const statusDiv = document.getElementById('systemStatus');
+            statusDiv.innerHTML = '<div class="result-item pending"><h4><span class="status-indicator status-pending"></span>Verificando servicios...</h4></div>';
+
+            // Detectar si estamos en modo frontend (nginx proxy) o desarrollo directo
+            const isNginxMode = window.location.hostname === 'localhost' && window.location.port === '8080';
+            
+            const services = [
+                { name: 'Product API', url: 'http://localhost:8081/health' },
+                { name: 'Customer API', url: 'http://localhost:8082/health' },
+                { 
+                    name: 'Order API', 
+                    url: isNginxMode ? 'http://localhost:3000/health' : 'http://localhost:3000/health'
+                }
+            ];
+
+            let statusHTML = '';
+
+            for (const service of services) {
+                try {
+                    const response = await fetch(service.url);
+                    if (response.ok) {
+                        statusHTML += `
+                            <div class="result-item">
+                                <h4><span class="status-indicator status-success"></span>${service.name}</h4>
+                                <p>Servicio funcionando correctamente ✅</p>
+                            </div>
+                        `;
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    statusHTML += `
+                        <div class="result-item error">
+                            <h4><span class="status-indicator status-error"></span>${service.name}</h4>
+                            <p>Error: ${error.message} ❌</p>
+                            <small>Asegúrate de que los servicios estén ejecutándose con docker-compose</small>
+                        </div>
+                    `;
+                }
+            }
+
+            statusDiv.innerHTML = statusHTML;
+        }
+
+        // Enviar orden
+        async function submitOrder() {
+            const submitBtn = document.getElementById('submitBtn');
+            const orderId = document.getElementById('orderId').value;
+            const customerId = document.getElementById('customerId').value;
+            const selectedProducts = Array.from(document.getElementById('products').selectedOptions)
+                .map(option => ({ productId: option.value }));
+
+            if (selectedProducts.length === 0) {
+                alert('Por favor selecciona al menos un producto');
+                return;
+            }
+
+            // Deshabilitar botón
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Enviando...';
+
+            const orderMessage = {
+                orderId: orderId,
+                customerId: customerId,
+                products: selectedProducts
+            };
+
+            try {
+                // Agregar orden a la vista como pendiente
+                addOrderToResults(orderMessage, 'pending');
+                
+                // Enviar orden a la API real (usa proxy nginx en modo frontend, directo en modo desarrollo)
+                const apiUrl = window.location.hostname === 'localhost' && window.location.port === '8080' 
+                    ? '/api/orders'  // Nginx proxy mode
+                    : 'http://localhost:3000/api/orders';  // Direct API mode
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderMessage)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Orden enviada exitosamente:', result);
+                    
+                    // Actualizar estado de la orden como enviada
+                    updateOrderStatus(orderId, 'pending', '⏳ Enriqueciendo con datos de productos...');
+                    
+                    // Mostrar mensaje de éxito
+                    alert(`✅ Orden enviada exitosamente a Kafka!\n\n📋 ID: ${orderId}\n⏰ Timestamp: ${result.timestamp}\n\n📊 Obteniendo datos completos de productos...`);
+                    
+                    // Consultar inmediatamente los datos procesados
+                    checkProcessedOrder(orderId);
+                    
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Error al enviar orden');
+                }
+                
+                // Generar nuevo ID único para la siguiente orden
+                generateNewOrderId();
+                
+                // Limpiar selecciones
+                document.getElementById('customerId').selectedIndex = 0;
+                document.getElementById('products').selectedIndex = -1;
+
+            } catch (error) {
+                console.error('❌ Error enviando orden:', error);
+                
+                // Si la API no está disponible, mostrar las instrucciones manuales
+                if (error.message.includes('fetch')) {
+                    alert(`⚠️ Order API no disponible. Para enviar manualmente:\n\n🔧 Comando Docker:\necho '${JSON.stringify(orderMessage)}' | docker-compose exec -T kafka kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders\n\n💡 O inicia la Order API: docker-compose up -d order-api`);
+                    updateOrderStatus(orderId, 'error', '❌ API no disponible - usar comando manual');
+                } else {
+                    alert('❌ Error enviando orden: ' + error.message);
+                    updateOrderStatus(orderId, 'error', '❌ ' + error.message);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Enviar Orden';
+            }
+        }
+
+        // Agregar orden a resultados
+        function addOrderToResults(order, status, errorMsg = null) {
+            const recentOrdersDiv = document.getElementById('recentOrders');
+            
+            if (recentOrdersDiv.innerHTML.includes('No hay órdenes recientes')) {
+                recentOrdersDiv.innerHTML = '';
+            }
+
+            const statusClass = status === 'error' ? 'error' : status === 'pending' ? 'pending' : '';
+            const statusIcon = status === 'error' ? 'status-error' : status === 'pending' ? 'status-pending' : 'status-success';
+            const statusText = status === 'error' ? 'Error' : status === 'pending' ? 'Enviada' : 'Completada';
+
+            const orderHTML = `
+                <div class="result-item ${statusClass}" id="order-${order.orderId}">
+                    <h4><span class="status-indicator ${statusIcon}"></span>Orden: ${order.orderId}</h4>
+                    <p><strong>Estado:</strong> ${statusText}</p>
+                    <p><strong>Cliente:</strong> ${order.customerId}</p>
+                    <p><strong>Productos:</strong> ${order.products.length} items</p>
+                    ${errorMsg ? `<p><strong>Error:</strong> ${errorMsg}</p>` : ''}
+                    <pre>${JSON.stringify(order, null, 2)}</pre>
+                    <small>💡 Para el flujo completo, usa: <code>docker-compose logs order-worker</code></small>
+                </div>
+            `;
+
+            recentOrdersDiv.insertAdjacentHTML('afterbegin', orderHTML);
+            orders.unshift({ ...order, status, timestamp: new Date() });
+        }
+
+        // Actualizar estado de orden
+        function updateOrderStatus(orderId, status, message) {
+            const orderElement = document.getElementById(`order-${orderId}`);
+            if (orderElement) {
+                let statusClass = '';
+                let statusIcon = '';
+                
+                switch(status) {
+                    case 'error':
+                        statusClass = 'error';
+                        statusIcon = 'status-error';
+                        break;
+                    case 'sent':
+                    case 'completed':
+                        statusClass = ''; // Verde (sin clase adicional)
+                        statusIcon = 'status-success';
+                        break;
+                    case 'pending':
+                    default:
+                        statusClass = 'pending';
+                        statusIcon = 'status-pending';
+                        break;
+                }
+                
+                orderElement.className = `result-item ${statusClass}`;
+                orderElement.querySelector('.status-indicator').className = `status-indicator ${statusIcon}`;
+                orderElement.querySelector('p').innerHTML = `<strong>Estado:</strong> ${message}`;
+            }
+        }
+
+        // Marcar orden como demo (no procesada realmente)
+        async function markOrderAsDemo(orderId) {
+            const orderElement = document.getElementById(`order-${orderId}`);
+            if (orderElement) {
+                orderElement.className = 'result-item pending';
+                orderElement.querySelector('.status-indicator').className = 'status-indicator status-pending';
+                orderElement.querySelector('p').innerHTML = '<strong>Estado:</strong> Demo (usar comando para procesamiento real) ⚠️';
+                
+                // Agregar nota explicativa
+                const noteElement = document.createElement('p');
+                noteElement.innerHTML = '<small>💡 <strong>Nota:</strong> Esta es una orden de demostración. Para procesamiento real, usa el comando mostrado arriba.</small>';
+                orderElement.appendChild(noteElement);
+            }
+        }
+
+        // Consultar orden procesada desde MongoDB (vía APIs)
+        async function checkProcessedOrder(orderId) {
+            try {
+                console.log(`🔍 Consultando orden procesada: ${orderId}`);
+                
+                // Simular consulta a APIs para obtener datos enriquecidos
+                // En un entorno real, esto consultaría MongoDB a través de una API
+                
+                const orderElement = document.getElementById(`order-${orderId}`);
+                if (orderElement) {
+                    // Simular datos procesados con información completa
+                    const processedOrder = await simulateProcessedOrderData(orderId);
+                    
+                    if (processedOrder.success) {
+                        // Actualizar la UI con datos completos
+                        updateOrderWithProcessedData(orderId, processedOrder.data);
+                        updateOrderStatus(orderId, 'completed', '✅ Completada con datos enriquecidos');
+                    } else {
+                        // Mostrar error específico según el tipo
+                        let errorMessage = '❌ ';
+                        switch(processedOrder.reason) {
+                            case 'CUSTOMER_INACTIVE':
+                                errorMessage += `Cliente inactivo - NO se guardará en MongoDB`;
+                                break;
+                            case 'CUSTOMER_NOT_FOUND':
+                                errorMessage += `Cliente no encontrado`;
+                                break;
+                            case 'PRODUCT_NOT_FOUND':
+                                errorMessage += `Producto no encontrado`;
+                                break;
+                            case 'CUSTOMER_API_ERROR':
+                            case 'PRODUCT_API_ERROR':
+                                errorMessage += `Error de API - reintentando`;
+                                break;
+                            default:
+                                errorMessage += `Error en procesamiento`;
+                        }
+                        
+                        updateOrderStatus(orderId, 'error', errorMessage);
+                        
+                        // Mostrar detalles del error en el JSON
+                        const orderElement = document.getElementById(`order-${orderId}`);
+                        if (orderElement) {
+                            const preElement = orderElement.querySelector('pre');
+                            if (preElement) {
+                                preElement.textContent = JSON.stringify({
+                                    orderId: orderId,
+                                    error: processedOrder.error,
+                                    reason: processedOrder.reason,
+                                    note: "Esta orden NO se guardará en MongoDB debido al error"
+                                }, null, 2);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error consultando orden procesada:', error);
+                updateOrderStatus(orderId, 'error', '❌ Error consultando estado');
+            }
+        }
+
+        // Simular datos procesados (en entorno real, consultaría MongoDB)
+        async function simulateProcessedOrderData(orderId) {
+            // Obtener la orden original
+            const originalOrder = orders.find(o => o.orderId === orderId);
+            if (!originalOrder) {
+                return { success: false, error: 'Orden no encontrada' };
+            }
+
+            // 1. VALIDAR CLIENTE PRIMERO (igual que el Order Worker real)
+            try {
+                const customerResponse = await fetch(`http://localhost:8082/customers/${originalOrder.customerId}`);
+                if (!customerResponse.ok) {
+                    return { 
+                        success: false, 
+                        error: `Cliente ${originalOrder.customerId} no encontrado`,
+                        reason: 'CUSTOMER_NOT_FOUND'
+                    };
+                }
+                
+                const customerData = await customerResponse.json();
+                if (!customerData.active) {
+                    return { 
+                        success: false, 
+                        error: `Cliente ${originalOrder.customerId} está inactivo`,
+                        reason: 'CUSTOMER_INACTIVE',
+                        customerData: customerData
+                    };
+                }
+            } catch (error) {
+                return { 
+                    success: false, 
+                    error: 'Error validando cliente: ' + error.message,
+                    reason: 'CUSTOMER_API_ERROR'
+                };
+            }
+
+            // 2. ENRIQUECER PRODUCTOS (solo si cliente es válido)
+            const enrichedProducts = [];
+            for (const product of originalOrder.products) {
+                try {
+                    const productResponse = await fetch(`http://localhost:8081/products/${product.productId}`);
+                    if (productResponse.ok) {
+                        const productData = await productResponse.json();
+                        enrichedProducts.push({
+                            productId: product.productId,
+                            name: productData.name,
+                            price: productData.price
+                        });
+                    } else {
+                        return { 
+                            success: false, 
+                            error: `Producto ${product.productId} no encontrado`,
+                            reason: 'PRODUCT_NOT_FOUND'
+                        };
+                    }
+                } catch (error) {
+                    return { 
+                        success: false, 
+                        error: `Error obteniendo producto ${product.productId}: ${error.message}`,
+                        reason: 'PRODUCT_API_ERROR'
+                    };
+                }
+            }
+
+            return {
+                success: true,
+                data: {
+                    orderId: orderId,
+                    customerId: originalOrder.customerId,
+                    products: enrichedProducts,
+                    status: 'completed',
+                    processedAt: new Date().toISOString()
+                }
+            };
+        }
+
+        // Actualizar orden con datos procesados
+        function updateOrderWithProcessedData(orderId, processedData) {
+            const orderElement = document.getElementById(`order-${orderId}`);
+            if (orderElement) {
+                // Actualizar el JSON mostrado
+                const preElement = orderElement.querySelector('pre');
+                if (preElement) {
+                    preElement.textContent = JSON.stringify(processedData, null, 2);
+                }
+
+                // Actualizar información resumida
+                const productInfo = orderElement.querySelector('p:nth-of-type(4)'); // Productos line
+                if (productInfo) {
+                    const productDetails = processedData.products.map(p => `${p.name} ($${p.price})`).join(', ');
+                    productInfo.innerHTML = `<strong>Productos:</strong> ${processedData.products.length} items (${productDetails})`;
+                }
+            }
+        }
+
+        // Verificar resultado de orden (legacy - mantener para compatibilidad)
+        async function checkOrderResult(orderId) {
+            return checkProcessedOrder(orderId);
+        }
+
+        // Cargar contador de órdenes
+        function loadOrderCounter() {
+            const saved = localStorage.getItem('orderCounter');
+            if (saved) {
+                orderCounter = parseInt(saved);
+            }
+        }
+
+        // Cargar orden de ejemplo
+        function loadSampleOrder() {
+            generateNewOrderId(); // Generar ID único
+            document.getElementById('customerId').value = 'customer-1';
+            
+            // Seleccionar algunos productos
+            const productsSelect = document.getElementById('products');
+            productsSelect.options[0].selected = true; // Laptop
+            productsSelect.options[1].selected = true; // Mouse
+        }
+
+        // Limpiar resultados
+        function clearResults() {
+            document.getElementById('recentOrders').innerHTML = `
+                <p style="color: #666; text-align: center; padding: 20px;">
+                    No hay órdenes recientes. Crea una orden para comenzar.
+                </p>
+            `;
+            orders = [];
+        }
+
+        // Mostrar documentación
+        function showDocs() {
+            alert(`📚 Documentación del Sistema
+
+🚀 Para usar el sistema completo:
+
+1. Ejecutar: docker-compose up -d
+2. Verificar que todos los servicios estén healthy
+3. Usar este frontend para pruebas rápidas
+4. Para testing completo, usar Postman Collection
+
+📊 Endpoints disponibles:
+• Product API: http://localhost:8081
+• Customer API: http://localhost:8082
+• Order API: http://localhost:3000
+• MongoDB: localhost:27017
+• Redis: localhost:6379
+
+🔍 Scripts de testing:
+• test-final-system.ps1 - Test completo
+• test-mongodb-apis.ps1 - Test APIs
+• test-package-change.ps1 - Test estructura
+
+📖 Ver README.md para documentación completa`);
+        }
+
+        // Función para enviar orden real via Kafka (requeriría backend)
+        async function sendToKafka(orderMessage) {
+            // Esta función requeriría un endpoint backend que publique a Kafka
+            // Por ahora, mostramos el mensaje que se enviaría
+            console.log('Mensaje que se enviaría a Kafka:', JSON.stringify(orderMessage));
+            
+            // En un entorno real, esto sería:
+            // const response = await fetch('/api/send-order', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(orderMessage)
+            // });
+            
+            return Promise.resolve(); // Simular éxito
+        }
+    </script>
+</body>
+</html>
