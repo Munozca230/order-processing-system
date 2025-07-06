@@ -51,7 +51,10 @@ class OrderIntegrationTest {
             .withStartupTimeout(Duration.ofSeconds(60));
 
     @Container
-    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine")).withExposedPorts(6379);
+    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379)
+            .waitingFor(Wait.forLogMessage(".*Ready to accept connections.*\n", 1))
+            .withStartupTimeout(Duration.ofSeconds(60));
 
     private static WireMockServer productMock;
     private static WireMockServer customerMock;
@@ -77,8 +80,8 @@ class OrderIntegrationTest {
         registry.add("spring.kafka.consumer.auto-offset-reset", () -> "earliest");
         registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
         registry.add("spring.data.mongodb.database", () -> "test");
-        registry.add("spring.redis.host", () -> redis.getHost());
-        registry.add("spring.redis.port", () -> redis.getMappedPort(6379).toString());
+        registry.add("REDIS_HOST", () -> redis.getHost());
+        registry.add("REDIS_PORT", () -> redis.getMappedPort(6379).toString());
         registry.add("app.product-api.base-url", () -> "http://localhost:" + productMock.port());
         registry.add("app.customer-api.base-url", () -> "http://localhost:" + customerMock.port());
 

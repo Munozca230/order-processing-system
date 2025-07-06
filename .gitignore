@@ -148,6 +148,7 @@ kafka-data/
 
 # Claude AI assistant files
 .claude
+CLAUDE.md
 
 # Testing
 .nyc_output/
