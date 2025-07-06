@@ -160,5 +160,3 @@ docker-compose logs -f customer-api
 | Testing | ✅ | Testcontainers + E2E + Postman |
 
 ---
-
-**🚀 Sistema listo para producción con 100% cumplimiento de requerimientos técnicos.**

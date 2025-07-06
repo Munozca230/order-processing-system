@@ -181,25 +181,29 @@ sequenceDiagram
     O->>K: 8. Publish a topic 'orders'<br/>📨 Kafka Producer envía mensaje
     O->>F: 9. Response 200 OK<br/>✅ {success: true, orderId, timestamp}
     
-    %% 4. Frontend Status Update
-    F->>F: 10. Actualizar UI: "⏳ Enriqueciendo..."<br/>🟡 Estado amarillo inicial
-    F->>P: 11. GET /products/{productId}<br/>🔍 Consulta previa para preview
-    P->>M: 12. Query catalog.products<br/>📊 MongoDB lookup
-    M-->>P: 13. Product data<br/>💡 {productId, name, price}
-    P-->>F: 14. Product details<br/>📦 JSON response
+    %% 4. Frontend Real-Time Validation (Parallel to Backend Processing)
+    F->>F: 10. Actualizar UI: "⏳ Validando orden..."<br/>🟡 Estado amarillo inicial
     
-    F->>C: 15. GET /customers/{customerId}<br/>🔍 Consulta validación cliente
-    C->>M: 16. Query catalog.customers<br/>📊 MongoDB lookup
-    M-->>C: 17. Customer data<br/>👤 {customerId, name, active: true}
-    C-->>F: 18. Customer details<br/>📦 JSON response
+    par Frontend validation calls (immediate)
+        F->>P: 11. GET /products/{productId}<br/>🔍 **REAL API CALL** - misma API que usa Worker
+        P->>M: 12. Query catalog.products<br/>📊 MongoDB lookup (real)
+        M-->>P: 13. Product data<br/>💡 {productId, name, price}
+        P-->>F: 14. Product details<br/>📦 JSON response
+    and
+        F->>C: 15. GET /customers/{customerId}<br/>🔍 **REAL API CALL** - misma API que usa Worker  
+        C->>M: 16. Query catalog.customers<br/>📊 MongoDB lookup (real)
+        M-->>C: 17. Customer data<br/>👤 {customerId, name, active: true}
+        C-->>F: 18. Customer details<br/>📦 JSON response
+    end
     
-    %% 5. Frontend Validation & UI Update
-    F->>V: 19. Validar cliente activo<br/>✅ customer.active === true
-    V-->>F: 20. ✅ Validación exitosa
-    F->>F: 21. Actualizar UI inmediatamente<br/>🟢 "✅ Completada con datos enriquecidos"
-    F->>U: 22. Mostrar orden completa<br/>📋 Productos con nombres y precios
+    %% 5. Frontend Real-Time Validation Results
+    F->>F: 19. Validar datos reales<br/>✅ customer.active === true && products exist
+    F->>F: 20. Actualizar UI con datos REALES<br/>🟢 "✅ Orden válida - enviando a procesamiento"
+    F->>U: 21. Mostrar orden con datos reales<br/>📋 Cliente: "Premium User" | Producto: "RTX 4060 $899"
     
-    Note over K,W: 📨 Procesamiento Asíncrono en Background
+    Note over F,U: 🎯 **IMPORTANTE**: Frontend hace llamadas HTTP REALES<br/>Las mismas APIs que usa Order Worker - NO es simulación<br/>Por eso puede mostrar validación precisa inmediatamente
+    
+    Note over K,W: 📨 Procesamiento Asíncrono Paralelo en Background
     
     %% 6. Kafka Message Processing
     K->>W: 23. Consume message<br/>🔄 @KafkaListener activation
