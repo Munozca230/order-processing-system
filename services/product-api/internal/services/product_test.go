@@ -162,7 +162,7 @@ func TestProductService_GetProduct_ErrorCase(t *testing.T) {
 	service := createTestProductService(mockRepo)
 	ctx := context.Background()
 	
-	mockRepo.On("GetByID", ctx, "product-error").Return(nil, errors.New("database error"))
+	// No mock needed - product-error has special handling that doesn't call repository
 	
 	product, err := service.GetProduct(ctx, "product-error")
 	
@@ -170,7 +170,7 @@ func TestProductService_GetProduct_ErrorCase(t *testing.T) {
 	assert.Nil(t, product)
 	assert.Contains(t, err.Error(), "this product always returns an error")
 	assert.Equal(t, int64(1), service.errors)
-	mockRepo.AssertExpectations(t)
+	// No need to assert expectations since no repository call is made
 }
 
 func TestProductService_GetProduct_TestErrorProduct(t *testing.T) {

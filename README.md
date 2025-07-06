@@ -88,6 +88,7 @@ open http://localhost:8080   # macOS
 
 ### **📊 URLs del Sistema**
 - **Frontend Web**: http://localhost:8080 (Interfaz completa)
+- **Order API**: http://localhost:3000/api/orders (Incluye order status)
 - **Product API**: http://localhost:8081/health
 - **Customer API**: http://localhost:8082/health  
 
@@ -104,13 +105,14 @@ docker-compose --profile frontend up -d
 
 ```
 🌐 Frontend → 📨 Order API → 📨 Kafka → ⚙️ Order Worker (Java 21)
-                                            ↓
+              ↗ Status Proxy ←───────────┘
 🛍️ Product API ← 🔍 Enrichment ← 👥 Customer API ← ✅ Validation  
      ↓                                ↓
 💾 MongoDB (Catalog) ← 📊 Storage ← 💾 MongoDB (Orders)
 ```
 
 ### **🔧 Componentes**
+- **Order API** (Node.js): Recibe órdenes, proxy a Order Worker para status
 - **Order Worker** (Java 21 + WebFlux): Consume Kafka, enriquece datos, valida y persiste
 - **Product/Customer APIs** (Go + Clean Architecture): Proveen datos del catálogo  
 - **Frontend** (HTML/JS): Interfaz web que consume las APIs directamente

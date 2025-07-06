@@ -61,7 +61,9 @@ class OrderKafkaConsumerTest {
         EnrichedOrder enrichedOrder = new EnrichedOrder(orderMessage, null, List.of(productDetails));
         
         // Mock order document for save (using record constructor)
-        OrderDocument orderDocument = new OrderDocument("saved-id", "test-1", "c1", List.of(productDetails));
+        OrderDocument orderDocument = new OrderDocument("saved-id", "test-1", "c1", List.of(productDetails), 
+            com.orderprocessing.orderworker.model.OrderStatus.COMPLETED, java.time.LocalDateTime.now(), 
+            java.time.LocalDateTime.now(), java.time.LocalDateTime.now(), null, 0);
         
         // Setup mocks
         when(orderLockService.acquire(anyString())).thenReturn(Mono.just(true));

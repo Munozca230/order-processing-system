@@ -74,7 +74,8 @@ public class OrderKafkaConsumer {
                                     
                                     return orderRepository.save(doc)
                                             .retryWhen(reactor.util.retry.Retry.backoff(5, java.time.Duration.ofSeconds(1)))
-                                            .doOnSuccess(saved -> logger.info("✅ MONGODB SAVE SUCCESS: id={}, orderId={}", saved.id(), saved.orderId()))
+                                            .doOnSuccess(saved -> logger.info("✅ MONGODB SAVE SUCCESS: id={}, orderId={}, status={}", 
+                                                saved.id(), saved.orderId(), saved.status()))
                                             .doOnError(error -> logger.error("❌ MONGODB SAVE FAILED for order: {}", valid.order().orderId(), error))
                                             .thenReturn(valid);
                                 })

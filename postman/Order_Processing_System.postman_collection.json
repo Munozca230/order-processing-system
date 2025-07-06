@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Order Processing System - Complete Testing",
-    "description": "Colección completa para probar el sistema de procesamiento de pedidos con arquitectura de microservicios.\n\n🚀 **Características:**\n- Testing completo de APIs Go\n- Verificación de health checks\n- Pruebas de validación y enriquecimiento\n- Casos de error y reintentos\n- Comandos CLI para MongoDB\n\n📋 **Prerequisitos:**\n1. Ejecutar: `docker-compose up -d`\n2. Esperar 45 segundos para inicialización\n3. Verificar servicios healthy\n\n🔍 **Orden de ejecución recomendada:**\n1. Health Checks\n2. API Testing\n3. Order Processing Scenarios\n4. MongoDB CLI Commands",
+    "description": "Colección completa para probar el sistema de procesamiento de pedidos con arquitectura de microservicios.\n\n🚀 **Características:**\n- Testing completo de APIs Go\n- Verificación de health checks\n- Pruebas de validación y enriquecimiento\n- Casos de error y reintentos\n- Endpoint parametrizado para consulta de estado de órdenes\n- Comandos CLI para MongoDB\n\n📋 **Prerequisitos:**\n1. Ejecutar: `docker-compose up -d`\n2. Esperar 45 segundos para inicialización\n3. Verificar servicios healthy\n\n🔍 **Orden de ejecución recomendada:**\n1. Health Checks\n2. API Testing\n3. Order Processing Scenarios\n4. MongoDB CLI Commands\n\n💡 **Tip:** Use el endpoint \"Get Order Status\" con la variable {{orderId}} para probar cualquier orden. Para testing dinámico, primero envíe órdenes usando \"Order Processing Scenarios\" y luego consulte su estado.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -33,6 +33,16 @@
     {
       "key": "orderApiPort",
       "value": "3000",
+      "type": "string"
+    },
+    {
+      "key": "orderWorkerPort",
+      "value": "3000",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "test-order-001",
       "type": "string"
     }
   ],
@@ -324,6 +334,51 @@
             },
             "description": "Probar pedido con múltiples productos válidos"
           },
+          "response": []
+        },
+        {
+          "name": "Get Order Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{orderWorkerPort}}/api/orders/{{orderId}}/status",
+              "host": ["{{baseUrl}}"],
+              "port": "{{orderWorkerPort}}",
+              "path": ["api", "orders", "{{orderId}}", "status"]
+            },
+            "description": "Get the status of any order by providing the orderId variable. Update the {{orderId}} variable to test different orders."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has order status\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('orderId');",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "    });",
+                  "    ",
+                  "    pm.test(\"Status is valid\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        const validStatuses = ['PROCESSING', 'COMPLETED', 'FAILED', 'RETRYING'];",
+                  "        pm.expect(validStatuses).to.include(jsonData.status);",
+                  "    });",
+                  "} else if (pm.response.code === 404) {",
+                  "    pm.test(\"Order not found - empty response\", function () {",
+                  "        pm.expect(pm.response.text()).to.be.empty;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
           "response": []
         }
       ]

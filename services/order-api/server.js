@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Kafka } = require('kafkajs');
+const fetch = require('node-fetch');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -113,6 +114,49 @@ app.get('/api/orders/:orderId', (req, res) => {
     orderId: req.params.orderId,
     mongoCommand: `docker-compose exec mongo mongosh orders --eval "db.orders.find({orderId: '${req.params.orderId}'}).forEach(printjson)"`
   });
+});
+
+// Get order status endpoint (proxy to Order Worker)
+app.get('/api/orders/:orderId/status', async (req, res) => {
+  try {
+    const response = await fetch(`http://order-worker:8080/api/orders/${req.params.orderId}/status`, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return res.status(404).json({
+          error: 'Order not found',
+          orderId: req.params.orderId
+        });
+      }
+      return res.status(response.status).json({
+        error: 'Unable to retrieve order status'
+      });
+    }
+    
+    const statusData = await response.json();
+    
+    // Add no-cache headers to response
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
+    res.json(statusData);
+  } catch (error) {
+    console.error('❌ Error fetching order status:', error);
+    res.status(503).json({ 
+      error: 'Order status service unavailable',
+      message: 'Please try again later'
+    });
+  }
 });
 
 // Start server

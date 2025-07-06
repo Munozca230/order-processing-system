@@ -37,8 +37,9 @@
 - **Auto Order IDs** - Generación única para evitar duplicados
 
 ### **🚪 Capa API Gateway (Perfil: frontend)**
-- **Order API** (Node.js + Express) - Puerto 3000 - Bridge frontend ↔ Kafka
+- **Order API** (Node.js + Express) - Puerto 3000 - Bridge frontend ↔ Kafka + Status Proxy
 - **Kafka Producer** - Publicación de mensajes + validación de esquema
+- **Status Proxy** - Consulta transparente a Order Worker para estado de órdenes
 
 ### **📨 Capa Message Broker (Todos los perfiles)**
 - **Zookeeper** (bitnami/zookeeper:3.9) - Puerto 2181 - Coordinación cluster
@@ -225,6 +226,17 @@ sequenceDiagram
     C->>M: 34. Query catalog.customers<br/>📊 Repository pattern
     M-->>C: 35. Customer document<br/>👤 Complete customer data
     C-->>W: 36. ✅ Customer validated<br/>📦 {customerId, name, active: true}
+    
+    %% 37. Order Status Tracking
+    Note over W,O: 🔍 Order Status Endpoint (NEW)
+    U->>F: 37. Request order status<br/>📊 Check order progress
+    F->>A: 38. GET /api/orders/{orderId}/status<br/>🔍 Proxy request
+    A->>W: 39. GET /orders/{orderId}/status<br/>📊 Internal service call
+    W->>O: 40. Query order status<br/>💾 MongoDB + Redis lookup
+    O-->>W: 41. Status response<br/>📋 {status: "COMPLETED/PROCESSING/FAILED"}
+    W-->>A: 42. Status data<br/>📊 Enriched status information
+    A-->>F: 43. JSON response<br/>📦 Complete order status
+    F-->>U: 44. Display status<br/>🎯 Real-time order tracking
     
     %% 9. Business Validation
     W->>V: 37. Apply business rules<br/>✅ Customer active + Products exist
