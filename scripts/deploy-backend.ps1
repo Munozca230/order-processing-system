@@ -1,4 +1,7 @@
 #!/usr/bin/env pwsh
+#
+# 🚀 ALTERNATIVA CROSS-PLATFORM: make backend
+# Este script mantiene funcionalidad completa, pero para simplicidad usa: make backend
 
 param(
     [switch]$PreserveData,

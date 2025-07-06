@@ -1,4 +1,10 @@
 #!/usr/bin/env pwsh
+# Cross-platform PowerShell script
+# Install PowerShell on macOS: brew install powershell
+# Or download from: https://github.com/PowerShell/PowerShell
+#
+# 🚀 ALTERNATIVA CROSS-PLATFORM: make frontend
+# Este script mantiene funcionalidad completa, pero para simplicidad usa: make frontend
 
 param(
     [switch]$PreserveData,

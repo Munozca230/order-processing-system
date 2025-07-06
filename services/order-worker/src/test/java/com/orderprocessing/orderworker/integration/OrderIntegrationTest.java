@@ -105,7 +105,7 @@ class OrderIntegrationTest {
     @Test
     @DisplayName("Debe procesar un mensaje de orden end-to-end")
     void shouldProcessOrder() throws InterruptedException {
-        String msg = "{\"orderId\":\"o1\",\"customerId\":\"c1\",\"products\":[\"p1\"]}";
+        String msg = "{\"orderId\":\"o1\",\"customerId\":\"c1\",\"products\":[{\"productId\":\"p1\"}]}";
         kafkaTemplate.send(new ProducerRecord<>("orders", null, msg));
         kafkaTemplate.flush();
 

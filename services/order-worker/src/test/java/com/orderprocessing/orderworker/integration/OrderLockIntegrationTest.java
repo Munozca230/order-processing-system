@@ -112,7 +112,7 @@ class OrderLockIntegrationTest {
     @Test
     @DisplayName("No debe persistir duplicados si llegan dos mensajes con el mismo orderId")
     void shouldProcessOnlyOnce() throws InterruptedException {
-        String msg = "{\"orderId\":\"dup-1\",\"customerId\":\"c1\",\"products\":[\"p1\"]}";
+        String msg = "{\"orderId\":\"dup-1\",\"customerId\":\"c1\",\"products\":[{\"productId\":\"p1\"}]}";
 
         // Enviar dos veces la misma orden
         kafkaTemplate.send(new ProducerRecord<>("orders", null, msg));
